@@ -7,9 +7,6 @@ This repository contains the **Flutter** frontend for OpenFinanceApp — a mobil
 - [Features](#features)
 - [Technology Stack](#technology-stack)
 - [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Overview
 **MyFinanceApp** allows users to:
