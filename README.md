@@ -1,4 +1,4 @@
-# MyFinanceApp Frontend
+# OpenFinanceApp Frontend
 
 This repository contains the **Flutter** frontend for OpenFinanceApp — a mobile application that provides a unified, real-time view of users’ investment portfolios. It connects to the ASP.NET MVC backend for secure API communication and data processing.
 
