@@ -24,6 +24,5 @@ This repository contains the **Flutter** frontend for OpenFinanceApp — a mobil
 - **Dart**: [https://dart.dev](https://dart.dev)
 - **C#**: https://learn.microsoft.com/en-us/dotnet/csharp/
 
-## Project Structure
-*(No code yet)*
+
 
