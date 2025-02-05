@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_finance_app/theme/colors.dart';
+import 'package:open_finance_app/widgets/buttons/primary_button.dart';
+import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'dart:convert';
+
+import 'package:open_finance_app/widgets/inputs/email_input_field.dart';
+import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,19 +20,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;
-
-  bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
 
   Future<void> _loginUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
+
       try {
         final response = await http.post(
-          Uri.parse('ENDPOINT_URL_HERE'), // TODO: Replace with Fernando's endpoint
+          Uri.parse(
+              'ENDPOINT_URL_HERE'), // TODO: Replace with Fernando's endpoint
           body: {
             'email': _emailController.text,
             'password': _passwordController.text,
@@ -34,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         final responseData = json.decode(response.body);
-        
+
         if (response.statusCode == 200) {
           Navigator.pushReplacementNamed(context, '/WalletScreen');
         } else {
@@ -66,10 +68,10 @@ class _LoginScreenState extends State<LoginScreen> {
               Flexible(
                 flex: 3,
                 child: Center(
-                    child: Image.asset(
+                  child: Image.asset(
                     'lib/assets/images/openfinanceapp_icon.png',
                     height: screenHeight * 0.2,
-                    ),
+                  ),
                 ),
               ),
 
@@ -84,56 +86,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Email Input
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!_isValidEmail(value)) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
+                        EmailInputField(controller: _emailController),
 
                         // Password Input
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            border: const OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                              icon: Icon(_obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
-                              onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 10),
+                        PasswordInputField(controller: _passwordController),
 
                         // Forgot Password
                         Align(
-                          alignment: Alignment.centerRight,
+                          alignment: Alignment.center,
                           child: TextButton(
-                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed:
+                                () {}, // TODO: Implement forgot password logic
                             child: const Text('Forgot my password'),
                           ),
                         ),
@@ -143,22 +112,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  // Placeholder for signup navigation
-                                },
-                                child: const Text('Sign Up'),
-                              ),
-                            ),
+                                // Signup Button
+                                child: SecondaryButton(
+                              text: 'Sign Up',
+                              onPressed: () {
+                                // Placeholder for navigation to Sign Up screen
+                              },
+                            )),
                             const SizedBox(width: 20),
                             Expanded(
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _loginUser,
-                                child: _isLoading
-                                    ? const CircularProgressIndicator(color: Colors.white)
-                                    : const Text('Continue'),
-                              ),
-                            ),
+                                // Continue Button
+                                child: PrimaryButton(
+                                    text: "Continue",
+                                    onPressed: _loginUser,
+                                    isLoading: _isLoading)),
                           ],
                         ),
                       ],
