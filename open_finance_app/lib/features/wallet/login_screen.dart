@@ -12,11 +12,11 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
+class LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>(); // https://docs.flutter.dev/cookbook/forms/validation
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;

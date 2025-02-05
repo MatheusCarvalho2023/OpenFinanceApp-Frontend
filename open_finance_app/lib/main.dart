@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // Theme colors
         primaryColor: AppColors.primaryColor,
-        scaffoldBackgroundColor: AppColors.primaryBackground,
+        scaffoldBackgroundColor: AppColors.secondaryBackground,
       ),
       // home: const SummaryScreen(),
       home: const LoginScreen(),
