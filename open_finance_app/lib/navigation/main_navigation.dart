@@ -18,6 +18,9 @@ class _MainNavigationState extends State<MainNavigation> {
   // The three main screens for the bottom bar:
   static final List<Widget> _pages = [
     const WalletScreen(),
+    const WalletScreen(), // For testing
+    const WalletScreen(), // For testing
+
     // const ConnectionsHomeScreen(),
     // const ProfileHomeScreen(),
   ];
@@ -33,9 +36,9 @@ class _MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.primary,
-        selectedItemColor: AppColors.accent,
-        unselectedItemColor: AppColors.text,
+        backgroundColor: AppColors.primaryColor,
+        selectedItemColor: AppColors.secondaryColor,
+        unselectedItemColor: AppColors.textPrimary,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
