@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
-// import 'package:open_finance_app/features/wallet/summary_screen.dart';
+import 'package:open_finance_app/features/wallet/summary_screen.dart';
 // import 'package:open_finance_app/features/wallet/assets_screen.dart';
 // import 'package:open_finance_app/features/wallet/analysis_screen.dart';
 // import 'package:open_finance_app/features/wallet/statements_screen.dart';
@@ -36,7 +36,9 @@ class WalletScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            // SummaryScreen(),
+            SummaryScreen(
+              clientID: 1,
+            ),
             // AssetsScreen(),
             // AnalysisScreen(),
             // StatementsScreen(),
