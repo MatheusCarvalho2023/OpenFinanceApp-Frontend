@@ -32,7 +32,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
   Future<SummaryData> fetchSummary(int clientID) async {
     // Update the URL to match the API endpoint
     final url = Uri.parse(
-        "http://10.0.2.2:5280/clients/$clientID/PortfolioTotalAmount");
+        "https://192.168.1.100:5280/clients/$clientID/PortifolioTotalAmount");
 
     try {
       // Sends a GET request to the backend API
