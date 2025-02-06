@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/wallet/login_screen.dart';
+import 'package:open_finance_app/features/wallet/wallet_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 // import 'package:open_finance_app/features/authentication/splash_screen.dart';
 // import 'package:open_finance_app/features/wallet/summary_screen.dart';
@@ -16,10 +18,11 @@ class MyApp extends StatelessWidget {
       title: 'OpenFinance App',
       theme: ThemeData(
         // Theme colors
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.secondary,
+        primaryColor: AppColors.primaryColor,
+        scaffoldBackgroundColor: AppColors.secondaryBackground,
       ),
       // home: const SummaryScreen(),
+      home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
