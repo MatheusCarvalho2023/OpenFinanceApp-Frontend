@@ -16,16 +16,16 @@ class WalletScreen extends StatelessWidget {
       child: Scaffold(
         // AppBar with a TabBar
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryColor,
           title: const Text(
-            "Wallet",
-            style: TextStyle(color: AppColors.accent),
+            "Wallet / Summary",
+            style: TextStyle(color: AppColors.textPrimary),
           ),
           centerTitle: true,
           bottom: const TabBar(
-            labelColor: AppColors.accent,
-            unselectedLabelColor: AppColors.text,
-            indicatorColor: AppColors.accent,
+            labelColor: AppColors.primaryColor,
+            unselectedLabelColor: AppColors.secondaryColor,
+            indicatorColor: AppColors.textPrimary,
             tabs: [
               Tab(text: "Summary"),
               Tab(text: "Assets"),

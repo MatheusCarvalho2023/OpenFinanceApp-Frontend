@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/navigation/main_navigation.dart';
+import 'package:open_finance_app/features/wallet/login_screen.dart';
+import 'package:open_finance_app/features/wallet/wallet_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 
 void main() async {
@@ -15,10 +17,11 @@ class MyApp extends StatelessWidget {
       title: 'OpenFinance App',
       theme: ThemeData(
         // Theme colors
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.secondary,
+        primaryColor: AppColors.primaryColor,
+        scaffoldBackgroundColor: AppColors.secondaryBackground,
       ),
-      home: const MainNavigation(),
+      // home: const SummaryScreen(),
+      home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
