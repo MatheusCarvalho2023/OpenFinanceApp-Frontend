@@ -32,25 +32,21 @@ class LoginScreenState extends State<LoginScreen> {
       try {
         final response = await http.post(
           Uri.parse(ApiEndpoints.login),
-          body: {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: json.encode({
             'email': _emailController.text,
             'password': _passwordController.text,
-          },
+          }),
         );
 
-        final responseData = json.decode(response.statusCode.toString());
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Response: $responseData')),
-        );
-
-        if (responseData.statusCode == 200) {
+        if (response.statusCode == 200) {
           Navigator.pushReplacement(
-            context,
+            context, 
             MaterialPageRoute(
-              builder: (context) => const SummaryScreen(
-                  clientID:
-                      1), // TODO: ID is hardcoded for now, need response from login API
+              builder: (context) => const SummaryScreen(clientID: 1),
             ),
           );
         } else {
@@ -60,7 +56,7 @@ class LoginScreenState extends State<LoginScreen> {
         }
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}')),
+          SnackBar(content: Text('Connection error: ${error.toString()}')),
         );
       } finally {
         setState(() => _isLoading = false);
