@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 /// Display the total cash amount for a specific account by calling a backend API.
 class SummaryScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
   Future<SummaryData> fetchSummary(int clientID) async {
     // Update the URL to match the API endpoint
     final url = Uri.parse(
-        "https://192.168.1.100:5280/clients/$clientID/PortifolioTotalAmount");
+        "http://10.0.2.2:5280/clients/$clientID/PortfolioTotalAmount");
 
     try {
       // Sends a GET request to the backend API
@@ -53,73 +54,147 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SummaryData>(
-      future: _futureSummaryData, // Uses the Future returned by fetchSummary
-      builder: (context, snapshot) {
-        // Loading state
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        // Error state
-        else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              "Error: ${snapshot.error}",
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        }
-        // Success state
-        else if (snapshot.hasData) {
-          final summaryData = snapshot.data!;
-          return _buildSummaryContent(summaryData);
-        } else {
-          return const Center(child: Text("No data available"));
-        }
-      },
+    // There is no AppBar here as it is located on the WalletScreen
+    return SafeArea(
+      child: FutureBuilder<SummaryData>(
+        future: _futureSummaryData,
+        builder: (context, snapshot) {
+          // Display a loading spinner while fetching data
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          } else if (snapshot.hasData) {
+            final summaryData = snapshot.data!;
+            return _buildSummaryContent(summaryData);
+          } else {
+            return const Center(child: Text("No data available"));
+          }
+        },
+      ),
     );
   }
 
-  /// Builds the UI showing the total cash amount, plus any other info.
+  /// Build the content using LayoutBuilder + SingleChildScrollView
   Widget _buildSummaryContent(SummaryData summaryData) {
-    // Format the sendDate from the API response
-    final formattedDate = DateFormat.yMMMd().format(summaryData.timestamp);
+    final numberFormat = NumberFormat.currency(symbol: '\$');
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // A circle with the total amount
-          Container(
-            width: MediaQuery.of(context).size.width * 0.5,
-            height: MediaQuery.of(context).size.width * 0.5,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey,
-            ),
-            child: Center(
+    // Sum of all values to display in the center of the pie chart
+    final totalGeral = summaryData.productTotals.fold<double>(
+      0.0,
+      (sum, prod) => sum + prod.total,
+    );
+
+    // LayoutBuilder was used to get the available dimensions.
+    // SingleChildScrollView + ConstrainedBox to take up at least all the vertical space, allowing scrolling if needed.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            // Ensure the minimum height is equal to the height of the screen
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    formattedDate, // Display the formatted date
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.primaryColor,
+                  // PieChart takes up 50% of the available height
+                  SizedBox(
+                    height: constraints.maxHeight * 0.5,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        PieChart(
+                          PieChartData(
+                            sections: _generateChartSections(summaryData),
+                            centerSpaceRadius: 120, // Size of the center hole
+                            sectionsSpace: 3,
+                          ),
+                        ),
+                        Text(
+                          numberFormat.format(totalGeral),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "\$ ${summaryData.totalAmount.toStringAsFixed(2)}", // Display the total amount
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor,
+
+                  const SizedBox(height: 20),
+
+                  // Container with padding, decoration, and a column of summary items
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 4),
+                      ],
+                    ),
+                    child: Column(
+                      children: summaryData.productTotals.map((product) {
+                        return _buildSummaryItem(
+                            product.product, product.total);
+                      }).toList(),
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Generate the sections for the PieChart associating each product with a color
+  List<PieChartSectionData> _generateChartSections(SummaryData summaryData) {
+    return summaryData.productTotals.map((product) {
+      Color color;
+      switch (product.product) {
+        case "Cash":
+          color = AppColors.accentGreen;
+          break;
+        case "Stock":
+          color = AppColors.accentYellow;
+          break;
+        case "Funds":
+          color = AppColors.accentRed;
+          break;
+        default:
+          color = Colors.blueGrey;
+      }
+
+      return PieChartSectionData(
+        value: product.total,
+        color: color,
+        radius: 50,
+        showTitle: false,
+      );
+    }).toList();
+  }
+
+  /// Build a summary item with a product name and its value
+  Widget _buildSummaryItem(String product, double value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            product,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          Text(
+            "\$${value.toStringAsFixed(2)}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),

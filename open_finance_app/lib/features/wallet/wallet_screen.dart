@@ -18,14 +18,14 @@ class WalletScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: AppColors.primaryColor,
           title: const Text(
-            "Wallet / Summary",
-            style: TextStyle(color: AppColors.textPrimary),
+            "Good morning, John!",
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           centerTitle: true,
           bottom: const TabBar(
-            labelColor: AppColors.primaryColor,
-            unselectedLabelColor: AppColors.secondaryColor,
-            indicatorColor: AppColors.textPrimary,
+            labelColor: AppColors.secondaryColor,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorColor: AppColors.textSecondary,
             tabs: [
               Tab(text: "Summary"),
               Tab(text: "Assets"),
