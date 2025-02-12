@@ -105,7 +105,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     formattedDate, // Display the formatted date
                     style: const TextStyle(
                       fontSize: 16,
-                      color: AppColors.text,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -114,7 +114,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.text,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                 ],
