@@ -42,9 +42,13 @@ class LoginScreenState extends State<LoginScreen> {
           }),
         );
 
+        print('Status Code: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+
         if (response.statusCode == 200) {
+          print('Calling SummaryScreen');
           Navigator.pushReplacement(
-            context, 
+            context,
             MaterialPageRoute(
               builder: (context) => const SummaryScreen(clientID: 1),
             ),
