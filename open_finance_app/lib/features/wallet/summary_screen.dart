@@ -110,7 +110,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "\$ ${summaryData.totalAmount.toStringAsFixed(2)}", // Display the total amount
+                    "\$ ${summaryData.totalAmount.toStringAsFixed(2)}", // Display total amount
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
