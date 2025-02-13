@@ -58,7 +58,9 @@ class LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const SummaryScreen(clientID: 1),
+              builder: (context) => SummaryScreen(
+                clientID: json.decode(response.body)['clientID'],
+              ),
             ),
           );
         } else {
@@ -88,7 +90,7 @@ class LoginScreenState extends State<LoginScreen> {
             children: [
               // Logo Section (Upper Third)
               Flexible(
-                flex: 3,
+                flex: 2,
                 child: Center(
                   child: Image.asset(
                     'lib/assets/images/openfinanceapp_icon.png',
