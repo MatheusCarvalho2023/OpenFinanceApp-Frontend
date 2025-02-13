@@ -13,19 +13,27 @@ class AddressInputField extends StatefulWidget {
   State<AddressInputField> createState() => _AddressInputFieldState();
 }
 
-class _AddressInputFieldState extends State<AddressInputField> {
+String? _validateAddress(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Your address is required';
+  } else if (value.trim().length < 5) {
+    return 'Your address must be at least 5 characters';
+  }
+  return null;
+}
 
+class _AddressInputFieldState extends State<AddressInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextFormField(
         controller: widget.controller,
+        validator: _validateAddress,
         cursorColor: AppColors.primaryColor,
         decoration: const InputDecoration(
           labelText: 'Address',
-          labelStyle:
-              TextStyle(color: AppColors.textPrimary, fontSize: 16),
+          labelStyle: TextStyle(color: AppColors.textPrimary, fontSize: 16),
           prefixIcon: Icon(Icons.house, color: AppColors.primaryColor),
           filled: true,
           fillColor: AppColors.primaryBackground,
@@ -35,12 +43,6 @@ class _AddressInputFieldState extends State<AddressInputField> {
           ),
           errorStyle: TextStyle(color: AppColors.accentRed),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter your address';
-          }
-          return null;
-        },
       ),
     );
   }
