@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
-// import 'package:open_finance_app/features/wallet/assets_screen.dart';
+import 'package:open_finance_app/features/wallet/assets_screen.dart';
 // import 'package:open_finance_app/features/wallet/analysis_screen.dart';
 // import 'package:open_finance_app/features/wallet/statements_screen.dart';
 
@@ -39,7 +39,9 @@ class WalletScreen extends StatelessWidget {
             SummaryScreen(
               clientID: 1,
             ),
-            // AssetsScreen(),
+            AssetsScreen(
+              clientID: 1,
+            ),
             // AnalysisScreen(),
             // StatementsScreen(),
           ],

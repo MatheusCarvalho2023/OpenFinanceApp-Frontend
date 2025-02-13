@@ -35,9 +35,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
   /// Function to call the backend API, passing the client ID.
   Future<SummaryData> fetchSummary(int clientID) async {
     // Update the URL to match the API endpoint
-    final url = Uri.parse(
-        "http://10.0.2.2:5280/clients/$clientID/PortfolioTotalAmount");
-
+    final url = Uri.parse(ApiEndpoints.portfolioTotalAmount(clientID));
 
     try {
       // Sends a GET request to the backend API
@@ -185,7 +183,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
         case "Stock":
           color = AppColors.accentYellow;
           break;
-        case "Funds":
+        case "Mutual Fund":
           color = AppColors.accentRed;
           break;
         default:

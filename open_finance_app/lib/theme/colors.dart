@@ -10,4 +10,9 @@ class AppColors {
   static const Color accentRed = Color(0xFFFF6F61);
   static const Color secondaryBackground = Color(0xFFF5F5F5);
   static const Color secondaryColor = Color(0xFF87CEEB);
+
+  // Additional colors used in the assets screen
+  static const Color cardBackground = primaryBackground;
+  static const Color dividerColor = Colors.blueGrey;
+  static const Color shadowColor = Colors.black12;
 }
