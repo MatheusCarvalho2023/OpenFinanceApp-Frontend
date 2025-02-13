@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,9 +9,9 @@ import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/widgets/inputs/address_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/email_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/fullname_input_field.dart';
-import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 import 'dart:convert';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
+import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -21,6 +21,14 @@ class SignupScreen extends StatefulWidget {
 }
 
 class SignupScreenState extends State<SignupScreen> {
+  static final RegExp _passwordRegex = RegExp(
+    r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+  );
+
+  static final RegExp _emailRegex = RegExp(
+    r'^[a-zA-Z0-9.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+',
+  );
+
   final _formKey = GlobalKey<
       FormState>(); // https://docs.flutter.dev/cookbook/forms/validation
   final _emailController = TextEditingController();
@@ -113,6 +121,7 @@ class SignupScreenState extends State<SignupScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+
                         // Fullname Input
                         Column(
                           children: [
@@ -123,6 +132,7 @@ class SignupScreenState extends State<SignupScreen> {
                             ),
                           ],
                         ),
+
                         // Address Input
                         Column(
                           children: [
@@ -133,13 +143,24 @@ class SignupScreenState extends State<SignupScreen> {
                             ),
                           ],
                         ),
+
                         // Email Input
                         Column(
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(bottom: 5),
-                              child:
-                                  EmailInputField(controller: _emailController),
+                              child: EmailInputField(
+                                controller: _emailController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your email';
+                                  }
+                                  if (!_emailRegex.hasMatch(value)) {
+                                    return 'Please enter a valid email';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -150,7 +171,17 @@ class SignupScreenState extends State<SignupScreen> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 30),
                               child: PasswordInputField(
-                                  controller: _passwordController),
+                                controller: _passwordController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your password';
+                                  }
+                                  if (!_passwordRegex.hasMatch(value)) {
+                                    return 'Password must contain at least 8 characters,\none uppercase letter, one number and one special character';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                           ],
                         ),

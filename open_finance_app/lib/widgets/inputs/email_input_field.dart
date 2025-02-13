@@ -3,13 +3,12 @@ import 'package:open_finance_app/theme/colors.dart';
 
 class EmailInputField extends StatelessWidget {
   final TextEditingController controller;
-  static final RegExp _emailRegex = RegExp(
-    r'^[a-zA-Z0-9.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+',
-  );
+  final String? Function(String?)? validator;
 
   const EmailInputField({
     super.key,
     required this.controller,
+    this.validator,
   });
 
   @override
@@ -19,6 +18,7 @@ class EmailInputField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         cursorColor: AppColors.primaryColor,
+        keyboardType: TextInputType.emailAddress,
         decoration: const InputDecoration(
           labelText: 'Email',
           labelStyle: TextStyle(color: AppColors.textPrimary, fontSize: 16),
@@ -31,16 +31,7 @@ class EmailInputField extends StatelessWidget {
           ),
           errorStyle: TextStyle(color: AppColors.accentRed),
         ),
-        // keyboardType: TextInputType.emailAddress,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter your email';
-          }
-          if (!_emailRegex.hasMatch(value)) {
-            return 'Please enter a valid email';
-          }
-          return null;
-        },
+        validator: validator,
       ),
     );
   }

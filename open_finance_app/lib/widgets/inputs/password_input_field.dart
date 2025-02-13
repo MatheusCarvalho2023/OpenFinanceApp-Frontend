@@ -3,13 +3,10 @@ import 'package:open_finance_app/theme/colors.dart';
 
 class PasswordInputField extends StatefulWidget {
   final TextEditingController controller;
-  // static final RegExp _passwordRegex = RegExp(
-  //   r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
-  // );
 
   const PasswordInputField({
     super.key,
-    required this.controller,
+    required this.controller, required String? Function(dynamic value) validator,
   });
 
   @override
@@ -55,10 +52,6 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
           if (value == null || value.isEmpty) {
             return 'Please enter your password';
           }
-          // USE WHEN CREATING A NEW ACCOUNT / RECOVERING PASSWORD
-          // if (!PasswordInputField._passwordRegex.hasMatch(value)) {
-          //   return 'Password must contain at least 8 characters,\none uppercase letter, one number and one special character';
-          // }
           return null;
         },
       ),
