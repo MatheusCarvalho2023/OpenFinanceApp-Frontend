@@ -6,12 +6,12 @@ import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
+import 'package:open_finance_app/widgets/inputs/fullname_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/address_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/email_input_field.dart';
-import 'package:open_finance_app/widgets/inputs/fullname_input_field.dart';
+import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 import 'dart:convert';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
-import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -44,12 +44,14 @@ class SignupScreenState extends State<SignupScreen> {
 
       try {
         final response = await http.post(
-          Uri.parse(ApiEndpoints.login),
+          Uri.parse(ApiEndpoints.signup),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
           body: json.encode({
+            'name': _fullnameController.text,
+            'address': _addressController.text,
             'email': _emailController.text,
             'password': _passwordController.text,
           }),
@@ -60,15 +62,27 @@ class SignupScreenState extends State<SignupScreen> {
 
         if (response.statusCode == 200) {
           print('Calling SummaryScreen');
+          final responseData = json.decode(response.body);
+          final clientID = responseData['clientID'];
+
+          if (clientID == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Invalid response: missing clientID')),
+            );
+            return;
+          }
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const SummaryScreen(clientID: 1),
+              builder: (context) => SummaryScreen(
+                clientID: clientID,
+              ),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed: ${response.body}')),
+            SnackBar(content: Text('Failed to sign up: ${response.body}')),
           );
         }
       } catch (error) {
