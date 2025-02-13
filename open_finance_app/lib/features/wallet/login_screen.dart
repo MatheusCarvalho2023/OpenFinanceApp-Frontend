@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,6 +19,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
+  static final RegExp _passwordRegex = RegExp(
+    r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+  );
+
+  static final RegExp _emailRegex = RegExp(
+    r'^[a-zA-Z0-9.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+',
+  );
+
   final _formKey = GlobalKey<
       FormState>(); // https://docs.flutter.dev/cookbook/forms/validation
   final _emailController = TextEditingController();
@@ -50,7 +58,9 @@ class LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const SummaryScreen(clientID: 1),
+              builder: (context) => SummaryScreen(
+                clientID: json.decode(response.body)['clientID'],
+              ),
             ),
           );
         } else {
@@ -80,7 +90,7 @@ class LoginScreenState extends State<LoginScreen> {
             children: [
               // Logo Section (Upper Third)
               Flexible(
-                flex: 3,
+                flex: 2,
                 child: Center(
                   child: Image.asset(
                     'lib/assets/images/openfinanceapp_icon.png',
@@ -100,10 +110,32 @@ class LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Email Input
-                        EmailInputField(controller: _emailController),
+                        EmailInputField(
+                          controller: _emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!_emailRegex.hasMatch(value)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
 
                         // Password Input
-                        PasswordInputField(controller: _passwordController),
+                        PasswordInputField(
+                          controller: _passwordController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (!_passwordRegex.hasMatch(value)) {
+                              return 'Password must contain at least 8 characters,\none uppercase letter, one number and one special character';
+                            }
+                            return null;
+                          },
+                        ),
 
                         // Forgot Password
                         Align(

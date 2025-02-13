@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:open_finance_app/api/api_endpoints.dart';
 
 /// Display the total cash amount for a specific account by calling a backend API.
 class SummaryScreen extends StatefulWidget {
@@ -36,6 +37,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
     // Update the URL to match the API endpoint
     final url = Uri.parse(
         "http://10.0.2.2:5280/clients/$clientID/PortfolioTotalAmount");
+
 
     try {
       // Sends a GET request to the backend API

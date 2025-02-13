@@ -1,28 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 
-class EmailInputField extends StatelessWidget {
+class AddressInputField extends StatefulWidget {
   final TextEditingController controller;
-  final String? Function(String?)? validator;
 
-  const EmailInputField({
+  const AddressInputField({
     super.key,
     required this.controller,
-    this.validator,
   });
 
+  @override
+  State<AddressInputField> createState() => _AddressInputFieldState();
+}
+
+String? _validateAddress(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Your address is required';
+  } else if (value.trim().length < 5) {
+    return 'Your address must be at least 5 characters';
+  }
+  return null;
+}
+
+class _AddressInputFieldState extends State<AddressInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextFormField(
-        controller: controller,
+        controller: widget.controller,
+        validator: _validateAddress,
         cursorColor: AppColors.primaryColor,
-        keyboardType: TextInputType.emailAddress,
         decoration: const InputDecoration(
-          labelText: 'Email',
+          labelText: 'Address',
           labelStyle: TextStyle(color: AppColors.textPrimary, fontSize: 16),
-          prefixIcon: Icon(Icons.email, color: AppColors.primaryColor),
+          prefixIcon: Icon(Icons.house, color: AppColors.primaryColor),
           filled: true,
           fillColor: AppColors.primaryBackground,
           border: OutlineInputBorder(
@@ -31,7 +43,6 @@ class EmailInputField extends StatelessWidget {
           ),
           errorStyle: TextStyle(color: AppColors.accentRed),
         ),
-        validator: validator,
       ),
     );
   }
