@@ -2,16 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
-import 'package:open_finance_app/widgets/buttons/primary_button.dart';
-import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/widgets/inputs/fullname_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/address_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/email_input_field.dart';
 import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
-import 'dart:convert';
+import 'package:open_finance_app/widgets/buttons/primary_button.dart';
+import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
+import 'package:open_finance_app/features/wallet/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -37,7 +38,6 @@ class SignupScreenState extends State<SignupScreen> {
   final _addressController = TextEditingController();
   bool _isLoading = false;
 
-  // TODO: Implement the signupUser method
   Future<void> _signupUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -206,9 +206,14 @@ class SignupScreenState extends State<SignupScreen> {
                             Expanded(
                                 // Cancel Button
                                 child: SecondaryButton(
-                              text: 'Cancel',
+                              text: 'Login',
                               onPressed: () {
-                                // TODO: Placeholder for navigation to go back to the previous screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
                               },
                             )),
                             const SizedBox(width: 20),
