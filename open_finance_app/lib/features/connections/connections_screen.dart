@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/widgets/connection_item.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -120,6 +121,33 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                 
                 const SizedBox(height: 20),
                 
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBackground,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      ConnectionItem(
+                        iconData: Icons.account_balance,
+                        bankName: "RBC",
+                        totalAccountBalance: "\$20,000.00",
+                        onTap: () {
+                          // Handle tap on connection
+                        },
+                      ),
+                      ConnectionItem(
+                        iconData: Icons.business,
+                        bankName: "Wealthsimple",
+                        totalAccountBalance: "\$9,219.20",
+                        onTap: () {
+                          // Handle tap on connection
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
