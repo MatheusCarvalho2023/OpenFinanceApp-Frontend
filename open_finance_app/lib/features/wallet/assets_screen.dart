@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/models/assets_model.dart';
-import 'package:intl/intl.dart';
-import 'package:open_finance_app/theme/colors.dart';
+import 'package:open_finance_app/widgets/assets_card.dart';
 
 class AssetsScreen extends StatefulWidget {
   final int clientID;
@@ -82,66 +81,8 @@ class _AssetsScreenState extends State<AssetsScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        // Map each productDetail to a card
-        children: products.map((prod) => _buildProductCard(prod)).toList(),
-      ),
-    );
-  }
-
-  /// Card layout for each ProductDetail
-  Widget _buildProductCard(ProductDetail product) {
-    final numberFormat = NumberFormat.currency(symbol: "\$");
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16), // Add margin between cards
-      padding: const EdgeInsets.all(16), // Add padding inside the card
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12), // Rounded corners
-        boxShadow: const [
-          BoxShadow(color: AppColors.shadowColor, blurRadius: 4) // Add shadow
-        ],
-      ),
-      child: Column(
-        // Column to vertically align the content
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product name
-          Text(
-            product.productName,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-
-          const Divider(
-              color: AppColors.dividerColor, thickness: 1), // Add a divider
-          const SizedBox(
-              height: 8), // Add space between the divider and content
-
-          // Show product total
-          Row(
-            // Row to align the content horizontally
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Total", style: TextStyle(fontSize: 16)),
-              Text(
-                numberFormat.format(product.prodTotal), // Format as currency
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-
-          // Show portfolio percentage
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("% of portfolio", style: TextStyle(fontSize: 16)),
-              Text(
-                "${product.portfolioPercentage.toStringAsFixed(2)}%", // Format as percentage
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ],
+        // Map each productDetail to an AssetsCard widget
+        children: products.map((prod) => AssetsCard(product: prod)).toList(),
       ),
     );
   }
