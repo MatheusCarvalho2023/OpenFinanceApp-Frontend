@@ -3,10 +3,10 @@ import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
 import 'package:open_finance_app/features/wallet/assets_screen.dart';
 
-class WalletWidget extends StatelessWidget {
+class TabMenu extends StatelessWidget {
   final int clientID;
 
-  const WalletWidget({
+  const TabMenu({
     super.key,
     required this.clientID,
   });
