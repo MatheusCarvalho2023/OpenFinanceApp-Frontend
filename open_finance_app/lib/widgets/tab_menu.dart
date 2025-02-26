@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
 import 'package:open_finance_app/features/wallet/assets_screen.dart';
-// import 'package:open_finance_app/features/wallet/analysis_screen.dart';
-// import 'package:open_finance_app/features/wallet/statements_screen.dart';
 
-/// Contains a top TabBar with four tabs
-class WalletScreen extends StatelessWidget {
-  const WalletScreen({super.key});
+class TabMenu extends StatelessWidget {
+  final int clientID;
+
+  const TabMenu({
+    super.key,
+    required this.clientID,
+  });
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4, // four tabs
+      length: 4,
       child: Scaffold(
-        // AppBar with a TabBar
         appBar: AppBar(
           backgroundColor: AppColors.primaryColor,
           title: const Text(
@@ -34,16 +35,14 @@ class WalletScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            SummaryScreen(
-              clientID: 1,
-            ),
-            AssetsScreen(
-              clientID: 1,
-            ),
-            // AnalysisScreen(),
-            // StatementsScreen(),
+            SummaryScreen(clientID: clientID),
+            AssetsScreen(clientID: clientID),
+            // AnalysisScreen() // se existir
+            // StatementsScreen() // se existir
+            Container(), // placeholder
+            Container(), // placeholder
           ],
         ),
       ),

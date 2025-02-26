@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/widgets/product_summary.dart';
 
 /// Display the total cash amount for a specific account by calling a backend API.
 class SummaryScreen extends StatefulWidget {
@@ -158,8 +159,9 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     // Create a list of summary items for each product using .map()
                     child: Column(
                       children: summaryData.productTotals.map((product) {
-                        return _buildSummaryItem(
-                            product.product, product.total);
+                        // Return a ProductSummary widget for each product.
+                        return ProductSummary(
+                            productName: product.product, value: product.total);
                       }).toList(),
                     ),
                   ),
@@ -197,30 +199,5 @@ class _SummaryScreenState extends State<SummaryScreen> {
         showTitle: false,
       );
     }).toList();
-  }
-
-  /// Builds a widget representing a summary item
-  /// with the product name and its total value.
-  Widget _buildSummaryItem(String product, double value) {
-    return Padding(
-      // Apply vertical padding between summary items.
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        // Arrange the product name and value on opposite ends of the row.
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Display the product name with bold formatting.
-          Text(
-            product,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          // Display the product total value formatted to 2 decimal places.
-          Text(
-            "\$${value.toStringAsFixed(2)}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
   }
 }
