@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
-import 'package:open_finance_app/widgets/wallet_widget.dart';
+import 'package:open_finance_app/widgets/tab_menu.dart';
 
 /// This widget holds a BottomNavigationBar
 class MainNavigation extends StatefulWidget {
@@ -22,7 +22,7 @@ class _MainNavigationState extends State<MainNavigation> {
     super.initState();
 
     _pages = [
-      WalletWidget(clientID: widget.clientID),
+      TabMenu(clientID: widget.clientID),
       Container(color: Colors.red), // placeholder
       Container(color: Colors.green), // placeholder
     ];
