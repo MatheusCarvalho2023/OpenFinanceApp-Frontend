@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
 
 class ConnectionsScreen extends StatefulWidget {
@@ -134,7 +135,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         bankName: "RBC",
                         totalAccountBalance: "\$20,000.00",
                         onTap: () {
-                          // Handle tap on connection
+                          // TODO: Handle tap on connection
                         },
                       ),
                       ConnectionItem(
@@ -142,9 +143,12 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         bankName: "Wealthsimple",
                         totalAccountBalance: "\$9,219.20",
                         onTap: () {
-                          // Handle tap on connection
+                          // TODO: Handle tap on connection
                         },
                       ),
+                      AddConnectionButton(onTap: () {
+                        // TODO: Handle tap on add connection
+                      }),
                     ],
                   ),
                 ),
