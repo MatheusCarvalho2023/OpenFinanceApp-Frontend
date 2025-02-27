@@ -12,6 +12,8 @@ class AddConnectionScreen extends StatefulWidget {
 class _AddConnectionScreenState extends State<AddConnectionScreen> {
   int _selectedIndex = 1;
   int? _selectedBankIndex;
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _filteredBanks = [];
 
   // Sample bank data TODO: Replace with dynamic bank data from API
   final List<Map<String, dynamic>> _banks = [
@@ -23,6 +25,28 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     {'name': 'Wealthsimple', 'logo': null},
     {'name': 'Questrade', 'logo': null},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredBanks = List.from(_banks);
+    _searchController.addListener(_filterBanks);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+  
+  // Filters the banks based on the search query
+  void _filterBanks() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredBanks = _banks.where((bank) => 
+        bank['name'].toString().toLowerCase().contains(query)).toList();
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -51,19 +75,39 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search for your bank...',
+                prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
+                filled: true,
+                fillColor: AppColors.primaryBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
-              itemCount: _banks.length,
+              itemCount: _filteredBanks.length,
               separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) => BankConnection(
-                bankName: _banks[index]['name'],
-                bankLogo: _banks[index]['logo'],
+                bankName: _filteredBanks[index]['name'],
+                bankLogo: _filteredBanks[index]['logo'],
                 isSelected: _selectedBankIndex == index,
                 onTap: () => _selectBank(index),
               ),
             ),
           ),
+          
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: SizedBox(
