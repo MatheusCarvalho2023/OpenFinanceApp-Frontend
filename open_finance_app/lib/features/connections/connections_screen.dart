@@ -8,6 +8,7 @@ import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
+import 'package:open_finance_app/features/connections/add_connection_screen.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -147,7 +148,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         },
                       ),
                       AddConnectionButton(onTap: () {
-                        // TODO: Handle tap on add connection
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => const AddConnectionScreen(),
+                        ),
+                        );
                       }),
                     ],
                   ),
