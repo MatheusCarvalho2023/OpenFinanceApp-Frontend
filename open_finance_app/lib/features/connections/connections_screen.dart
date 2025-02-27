@@ -9,6 +9,7 @@ import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
 import 'package:open_finance_app/features/connections/add_connection_screen.dart';
+import 'package:open_finance_app/features/connections/connections_screen.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
