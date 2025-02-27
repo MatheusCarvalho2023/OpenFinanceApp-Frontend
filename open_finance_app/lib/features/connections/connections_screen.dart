@@ -8,6 +8,7 @@ import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
+import 'package:open_finance_app/widgets/buttons/addconnection_button.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -59,24 +60,38 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: FutureBuilder<SummaryData>(
-          future: _futureSummaryData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  "Error: ${snapshot.error}",
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            } else if (snapshot.hasData) {
-              return _buildConnectionsContent(snapshot.data!);
-            } else {
-              return const Center(child: Text("No data available"));
-            }
-          },
+        child: Stack(
+          children: [
+            FutureBuilder<SummaryData>(
+              future: _futureSummaryData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "Error: ${snapshot.error}",
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                } else if (snapshot.hasData) {
+                  return _buildConnectionsContent(snapshot.data!);
+                } else {
+                  return const Center(child: Text("No data available"));
+                }
+              },
+            ),
+            // Circular add connection button            
+            Positioned(
+              top: 24,
+              right: 24,
+              child: CircularAddConnectionButton(
+                onTap: () {
+                  // TODO: Handle tap on circular add connection button
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
