@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
+import 'package:open_finance_app/widgets/buttons/primary_button.dart';
+import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
+import 'package:open_finance_app/features/wallet/login_screen.dart';
 
 class ProfileHomeScreen extends StatefulWidget {
   const ProfileHomeScreen({super.key});
@@ -28,6 +31,50 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
           style: TextStyle(color: AppColors.textSecondary),
         ),
         centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              "Account Settings",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 32),
+            // My Profile Button
+            PrimaryButton(
+              text: "My Profile",
+              onPressed: () {
+                // TODO: Navigate to profile details screen
+              },
+            ),
+            const SizedBox(height: 16),
+            // Security Button
+            PrimaryButton(
+              text: "Security",
+              onPressed: () {
+                // TODO: Navigate to security settings screen
+              },
+            ),
+            const SizedBox(height: 16),
+            // Logout Button
+            SecondaryButton(
+              text: "Logout",
+              onPressed: () {
+                // TODO: Implement logout functionality, but it changes to login screen for now
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AppColors.primaryColor,
