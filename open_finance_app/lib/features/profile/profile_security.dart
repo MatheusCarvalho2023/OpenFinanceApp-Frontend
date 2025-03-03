@@ -3,22 +3,32 @@ import 'package:open_finance_app/features/profile/profile_home.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
+import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 
-class MyProfileScreen extends StatefulWidget {
-  const MyProfileScreen({super.key});
+class MySecurityScreen extends StatefulWidget {
+  const MySecurityScreen({super.key});
 
   @override
-  State<MyProfileScreen> createState() => _MyProfileScreenState();
+  State<MySecurityScreen> createState() => _MySecurityScreenState();
 }
 
-class _MyProfileScreenState extends State<MyProfileScreen> {
+class _MySecurityScreenState extends State<MySecurityScreen> {
   int _selectedIndex = 2;
+  final _oldPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       // TODO: Implement navigation
     });
+  }
+
+  @override
+  void dispose() {
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,7 +48,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "My Profile",
+              "Password & Security",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -47,60 +57,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
             const SizedBox(height: 30),
 
-            // Name
-            // TODO: Implement text editing controller
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Name',
-                hintText: 'John Smith',
-                prefixIcon:
-                    const Icon(Icons.person, color: AppColors.primaryColor),
-                filled: true,
-                fillColor: AppColors.primaryBackground,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+            // Old Password
+            PasswordInputField(
+              controller: _oldPasswordController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your old password';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
-            // Address
-            // TODO: Implement text editing controller
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Address',
-                hintText: '1 Cupertino Loop',
-                prefixIcon:
-                    const Icon(Icons.home, color: AppColors.primaryColor),
-                filled: true,
-                fillColor: AppColors.primaryBackground,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+            // New Password
+            PasswordInputField(
+              controller: _newPasswordController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your new password';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
-            // Email
-            // TODO: Implement text editing controller
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                hintText: 'john@doe.com',
-                prefixIcon:
-                    const Icon(Icons.email, color: AppColors.primaryColor),
-                filled: true,
-                fillColor: AppColors.primaryBackground,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-
+            // Confirm Password
             // Buttons Row
             Row(
               children: [
@@ -110,9 +91,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     text: 'Cancel',
                     onPressed: () {
                       Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ProfileHomeScreen()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ProfileHomeScreen()),
+                      );
                     },
                   ),
                 ),
@@ -121,7 +103,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 // Submit Button
                 Expanded(
                   child: PrimaryButton(
-                    text: 'Update',
+                    text: 'Confirm Password',
                     onPressed: () {
                       // TODO: Implement save changes functionality
                       ScaffoldMessenger.of(context).showSnackBar(
