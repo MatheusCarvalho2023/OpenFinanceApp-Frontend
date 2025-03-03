@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/profile/profile_myprofile.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
@@ -50,7 +51,10 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
             PrimaryButton(
               text: "My Profile",
               onPressed: () {
-                // TODO: Navigate to profile details screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MyProfileScreen()),
+              );
               },
             ),
             const SizedBox(height: 16),
