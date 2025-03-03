@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/features/profile/profile_myprofile.dart';
+import 'package:open_finance_app/features/profile/profile_security.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
@@ -62,7 +63,10 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
             PrimaryButton(
               text: "Security",
               onPressed: () {
-                // TODO: Navigate to security settings screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MySecurityScreen()),
+                );
               },
             ),
             const SizedBox(height: 16),
