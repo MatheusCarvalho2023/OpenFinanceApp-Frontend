@@ -8,10 +8,7 @@ import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
-import 'package:open_finance_app/widgets/buttons/addconnection_button.dart';
 import 'package:open_finance_app/features/connections/add_connection_screen.dart';
-import 'package:open_finance_app/features/connections/connections_screen.dart';
-
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -84,18 +81,29 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                 }
               },
             ),
-            // Circular add connection button            
-            Positioned(
-              top: 24,
-              right: 24,
-              child: CircularAddConnectionButton(
-                onTap: () {
-                  // TODO: Handle tap on circular add connection button
-                },
-              ),
-            ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppColors.primaryColor,
+        selectedItemColor: AppColors.secondaryColor,
+        unselectedItemColor: AppColors.textSecondary,
+        currentIndex: 1,
+        onTap: (index) {},
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.link),
+            label: 'Connections',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
@@ -137,9 +145,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                     ],
                   ),
                 ),
-                
-                const SizedBox(height: 20),
-                
+
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -150,29 +156,88 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                     children: [
                       ConnectionItem(
                         iconData: Icons.account_balance,
-                        bankName: "RBC",
+                        bankName: "The Bank of Nova Scotia",
                         totalAccountBalance: "\$20,000.00",
-                        onTap: () {
-                          // TODO: Handle tap on connection
-                        },
+                        switchValue: true,
+                        onSwitchChanged: (newValue) {},
+                        onTap: () {},
+                        drawerContent: const [
+                          Text(
+                              "Account #2345678", // ! Account number linked to bankID
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Balance:"),
+                              Text(
+                                  "\$12,500.00"), // ! connectionAmount linked to connectionID
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("% of connection:"),
+                              Text(
+                                  "62.5%"), // ! connectionPercentage linked to connectionID
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                              "Account #8887654", // Account number linked to bankID
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Balance:"),
+                              Text("\$7,500.00"),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("% of connection:"),
+                              Text("37.5%"),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                        ],
                       ),
                       ConnectionItem(
                         iconData: Icons.business,
                         bankName: "Wealthsimple",
                         totalAccountBalance: "\$9,219.20",
-                        onTap: () {
-                          // TODO: Handle tap on connection
-                        },
+                        onTap: () {},
+                        drawerContent: const [
+                          Text("Account #666777",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Balance:"),
+                              Text("\$9,219.20"),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("% of connection:"),
+                              Text("100%"),
+                            ],
+                          ),
+                        ],
                       ),
-                      AddConnectionButton(onTap: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => const AddConnectionScreen(),
-                        ),
-                        );
-                      }),
                     ],
                   ),
                 ),
+
+                AddConnectionButton(onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddConnectionScreen(),
+                    ),
+                  );
+                }),
               ],
             ),
           ),
