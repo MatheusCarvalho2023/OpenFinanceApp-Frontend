@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/bankconnection_button.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/features/connections/add_account_screen.dart';
 
 class AddConnectionScreen extends StatefulWidget {
-  const AddConnectionScreen({super.key});
+  final int clientID;
+  
+  const AddConnectionScreen({
+    super.key,
+    required this.clientID,
+  });
 
   @override
   State<AddConnectionScreen> createState() => _AddConnectionScreenState();
@@ -14,23 +23,53 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
   int? _selectedBankIndex;
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _filteredBanks = [];
-
-  // Sample bank data TODO: Replace with dynamic bank data from API
-  final List<Map<String, dynamic>> _banks = [
-    {'name': 'Royal Bank of Canada', 'logo': null},
-    {'name': 'TD Bank', 'logo': null},
-    {'name': 'Scotiabank', 'logo': null},
-    {'name': 'CIBC', 'logo': null},
-    {'name': 'BMO', 'logo': null},
-    {'name': 'Wealthsimple', 'logo': null},
-    {'name': 'Questrade', 'logo': null},
-  ];
+  List<Map<String, dynamic>> _banks = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _filteredBanks = List.from(_banks);
+    fetchBanks();
     _searchController.addListener(_filterBanks);
+  }
+
+  Future<void> fetchBanks() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final url = Uri.parse(ApiEndpoints.banks);
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> banksJson = jsonDecode(response.body);
+        
+        setState(() {
+          _banks = banksJson.map((bank) => {
+            'name': bank['bankName'] ?? 'Unknown Bank',
+            'logo': bank['logo'],
+            'bankID': bank['bankID'],
+          }).toList();
+          _filteredBanks = List.from(_banks);
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load banks: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        // If API fails, provide fallback data
+        _banks = [
+          {'name': 'Royal Bank of Canada', 'logo': null, 'bankID': 3},
+          {'name': 'TD Bank', 'logo': null, 'bankID': 1},
+          {'name': 'Scotiabank', 'logo': null, 'bankID': 2},
+        ];
+        _filteredBanks = List.from(_banks);
+      });
+      debugPrint('Error fetching banks: $e');
+    }
   }
 
   @override
@@ -94,19 +133,25 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
             ),
           ),
           
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: _filteredBanks.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              itemBuilder: (context, index) => BankConnection(
-                bankName: _filteredBanks[index]['name'],
-                bankLogo: _filteredBanks[index]['logo'],
-                isSelected: _selectedBankIndex == index,
-                onTap: () => _selectBank(index),
+          _isLoading 
+            ? const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _filteredBanks.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) => BankConnection(
+                    bankName: _filteredBanks[index]['name'],
+                    bankLogo: _filteredBanks[index]['logo'],
+                    isSelected: _selectedBankIndex == index,
+                    onTap: () => _selectBank(index),
+                  ),
+                ),
               ),
-            ),
-          ),
           
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -114,8 +159,30 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _selectedBankIndex != null
-                    ? () {
-                        // TODO: Handle connection to the selected bank
+                    ? () async {
+                        final selectedBank = _filteredBanks[_selectedBankIndex!];
+                        final bankId = selectedBank['bankID'] as int;
+                        final bankName = selectedBank['name'] as String;
+                        
+                        debugPrint('Connecting to bank: $bankName, bankID: $bankId');
+                        
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddAccountScreen(
+                              bankId: bankId,
+                              bankName: bankName,
+                              clientID: widget.clientID,
+                            ),
+                          ),
+                        );
+                        
+                        if (result == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Account added successfully')),
+                          );
+                          Navigator.pop(context, true); 
+                        }
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

@@ -1,8 +1,11 @@
 class ApiEndpoints {
-  static const String baseUrl = 'http://openfinance.us-east-1.elasticbeanstalk.com';
+  static const String baseUrl =
+      'http://openfinance.us-east-1.elasticbeanstalk.com';
 
   static const String login = '$baseUrl/authentication/login';
   static const String signup = '$baseUrl/authentication/signup';
+  static String banks = '$baseUrl/bankslist';
+  static String addConnection = '$baseUrl/clients/AddNewConnection';
 
   // endpoints for assets_screen.dart
   static String assetsSummary(int clientID) {

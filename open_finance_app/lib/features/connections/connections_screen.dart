@@ -52,7 +52,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     }
   }
 
- // Fetch connection data from the API
   Future<Connection> _fetchConnectionData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.connections(clientID));
 
@@ -153,108 +152,120 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Pie chart section remains the same
-                SizedBox(
-                  height: constraints.maxHeight * 0.5,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      PieChart(
-                        PieChartData(
-                          sections: _generateChartSections(summaryData),
-                          centerSpaceRadius: 120,
-                          sectionsSpace: 3,
+        return RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              _futureSummaryData = _fetchSummaryData(widget.clientID);
+              _futureConnectionData = _fetchConnectionData(widget.clientID);
+            });
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: constraints.maxHeight * 0.5,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        PieChart(
+                          PieChartData(
+                            sections: _generateChartSections(summaryData),
+                            centerSpaceRadius: 120,
+                            sectionsSpace: 3,
+                          ),
                         ),
-                      ),
-                      Text(
-                        numberFormat.format(totalGeral),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          numberFormat.format(totalGeral),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Connection items container
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryBackground,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: _groupConnectionsByBank(connectionData).entries.map((entry) {
-                      // Get the first connection to use for the main display
-                      ConnectionElement primaryConnection = entry.value.first;
-                      IconData iconData = Icons.account_balance;
-                      
-                      // Calculate total amount for all accounts from this bank
-                      double totalBankAmount = entry.value.fold(
-                        0, (sum, connection) => sum + (connection.connectionAmount ?? 0)
-                      );
-                      
-                      final formattedBalance = numberFormat.format(totalBankAmount);
-                      
-                      // Check if any connections are active
-                      bool isActive = entry.value.any((conn) => conn.isActive == true);
-
-                      return ConnectionItem(
-                        iconData: iconData,
-                        bankName: primaryConnection.bankName ?? "Unknown Bank",
-                        totalAccountBalance: formattedBalance,
-                        switchValue: isActive,
-                        onSwitchChanged: (newValue) {
-                          // TODO: Implement API call to update connection status for all accounts
-                        },
-                        drawerContent: [
-                          ...entry.value.map((account) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Account #${account.accountNumber}",
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Balance:"),
-                                    Text(numberFormat.format(account.connectionAmount ?? 0)),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("% of connection:"),
-                                    Text("${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            );
-                          }),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-
-                AddConnectionButton(onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddConnectionScreen(),
+                      ],
                     ),
-                  );
-                }),
-              ],
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBackground,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: _groupConnectionsByBank(connectionData).entries.map((entry) {
+                        ConnectionElement primaryConnection = entry.value.first;
+                        IconData iconData = Icons.account_balance;
+                        
+                        double totalBankAmount = entry.value.fold(
+                          0, (sum, connection) => sum + (connection.connectionAmount ?? 0)
+                        );
+                        
+                        final formattedBalance = numberFormat.format(totalBankAmount);
+                        
+                        bool isActive = entry.value.any((conn) => conn.isActive == true);
+
+                        return ConnectionItem(
+                          iconData: iconData,
+                          bankName: primaryConnection.bankName ?? "Unknown Bank",
+                          totalAccountBalance: formattedBalance,
+                          switchValue: isActive,
+                          onSwitchChanged: (newValue) {
+                            // TODO: Implement API call to update connection status for all accounts
+                          },
+                          drawerContent: [
+                            ...entry.value.map((account) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Account #${account.accountNumber}",
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text("Balance:"),
+                                      Text(numberFormat.format(account.connectionAmount ?? 0)),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text("% of connection:"),
+                                      Text("${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              );
+                            }),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  AddConnectionButton(onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddConnectionScreen(
+                          clientID: widget.clientID, 
+                        ),
+                      ),
+                    );
+                    
+                    if (result == true) {
+                      setState(() {
+                        _futureSummaryData = _fetchSummaryData(widget.clientID);
+                        _futureConnectionData = _fetchConnectionData(widget.clientID);
+                      });
+                    }
+                  }),
+                ],
+              ),
             ),
           ),
         );
