@@ -4,9 +4,15 @@ import 'package:open_finance_app/widgets/buttons/bankconnection_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/features/connections/add_account_screen.dart';
 
 class AddConnectionScreen extends StatefulWidget {
-  const AddConnectionScreen({super.key});
+  final int clientID;
+  
+  const AddConnectionScreen({
+    super.key,
+    required this.clientID,
+  });
 
   @override
   State<AddConnectionScreen> createState() => _AddConnectionScreenState();
@@ -153,13 +159,30 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _selectedBankIndex != null
-                    ? () {
+                    ? () async {
                         final selectedBank = _filteredBanks[_selectedBankIndex!];
-                        // TODO: Handle connection with selectedBank data
-                        debugPrint('Connecting to bank: ${selectedBank['name']}, bankID: ${selectedBank['bankID']}');
+                        final bankId = selectedBank['bankID'] as int;
+                        final bankName = selectedBank['name'] as String;
                         
-                        // Navigate back or to authentication screen for this bank
-                        Navigator.pop(context);
+                        debugPrint('Connecting to bank: $bankName, bankID: $bankId');
+                        
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddAccountScreen(
+                              bankId: bankId,
+                              bankName: bankName,
+                              clientID: widget.clientID,
+                            ),
+                          ),
+                        );
+                        
+                        if (result == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Account added successfully')),
+                          );
+                          Navigator.pop(context, true); 
+                        }
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
