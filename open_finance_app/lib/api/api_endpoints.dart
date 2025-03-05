@@ -18,4 +18,7 @@ class ApiEndpoints {
   static String connections(int clientID) {
     return '$baseUrl/clients/$clientID/GetAllConnections';
   }
+
+  // endpoint for banks list
+  static String banks = '$baseUrl/bankslist';
 }
