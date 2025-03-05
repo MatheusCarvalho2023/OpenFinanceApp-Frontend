@@ -9,6 +9,7 @@ import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
 import 'package:open_finance_app/features/connections/add_connection_screen.dart';
+import 'package:open_finance_app/models/connection_model.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -24,11 +25,13 @@ class ConnectionsScreen extends StatefulWidget {
 
 class _ConnectionsScreenState extends State<ConnectionsScreen> {
   late Future<SummaryData> _futureSummaryData;
+  late Future<Connection> _futureConnectionData;
 
   @override
   void initState() {
     super.initState();
     _futureSummaryData = _fetchSummaryData(widget.clientID);
+    _futureConnectionData = _fetchConnectionData(widget.clientID);
   }
 
   Future<SummaryData> _fetchSummaryData(int clientID) async {
@@ -48,6 +51,23 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     }
   }
 
+  Future<Connection> _fetchConnectionData(int clientID) async {
+    final url = Uri.parse(ApiEndpoints.connections(clientID));
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return Connection.fromJson(decoded);
+      } else {
+        throw Exception(
+            "Failed to load connection data. Status: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching connection data: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,28 +80,26 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            FutureBuilder<SummaryData>(
-              future: _futureSummaryData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      "Error: ${snapshot.error}",
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  );
-                } else if (snapshot.hasData) {
-                  return _buildConnectionsContent(snapshot.data!);
-                } else {
-                  return const Center(child: Text("No data available"));
-                }
-              },
-            ),
-          ],
+        child: FutureBuilder(
+          future: Future.wait([_futureSummaryData, _futureConnectionData]),
+          builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "Error: ${snapshot.error}",
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            } else if (snapshot.hasData) {
+              final summaryData = snapshot.data![0] as SummaryData;
+              final connectionData = snapshot.data![1] as Connection;
+              return _buildConnectionsContent(summaryData, connectionData);
+            } else {
+              return const Center(child: Text("No data available"));
+            }
+          },
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -108,7 +126,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     );
   }
 
-  Widget _buildConnectionsContent(SummaryData summaryData) {
+  Widget _buildConnectionsContent(SummaryData summaryData, Connection connectionData) {
     final numberFormat = NumberFormat.currency(symbol: '\$');
     final totalGeral = summaryData.productTotals.fold<double>(
       0.0,
@@ -122,7 +140,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Pie chart section
+                // Pie chart section remains the same
                 SizedBox(
                   height: constraints.maxHeight * 0.5,
                   child: Stack(
@@ -146,6 +164,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                   ),
                 ),
 
+                // Connection items container
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -153,80 +172,43 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
-                    children: [
-                      ConnectionItem(
-                        iconData: Icons.account_balance,
-                        bankName: "The Bank of Nova Scotia",
-                        totalAccountBalance: "\$20,000.00",
-                        switchValue: true,
-                        onSwitchChanged: (newValue) {},
+                    children: connectionData.connections.map((connection) {
+                      // Map icon based on bank name (you might want to improve this)
+                      IconData iconData = Icons.account_balance;
+
+                      final formattedBalance = numberFormat.format(connection.connectionAmount ?? 0);
+
+                      return ConnectionItem(
+                        iconData: iconData,
+                        bankName: connection.bankName ?? "Unknown Bank",
+                        totalAccountBalance: formattedBalance,
+                        switchValue: connection.isActive ?? false,
+                        onSwitchChanged: (newValue) {
+                          // TODO: Implement API call to update connection status
+                        },
                         onTap: () {},
-                        drawerContent: const [
+                        drawerContent: [
                           Text(
-                              "Account #2345678", // ! Account number linked to bankID
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                            "Account #${connection.accountNumber}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Balance:"),
-                              Text(
-                                  "\$12,500.00"), // ! connectionAmount linked to connectionID
+                              const Text("Balance:"),
+                              Text(formattedBalance),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("% of connection:"),
-                              Text(
-                                  "62.5%"), // ! connectionPercentage linked to connectionID
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                              "Account #8887654", // Account number linked to bankID
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Balance:"),
-                              Text("\$7,500.00"),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("% of connection:"),
-                              Text("37.5%"),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                        ],
-                      ),
-                      ConnectionItem(
-                        iconData: Icons.business,
-                        bankName: "Wealthsimple",
-                        totalAccountBalance: "\$9,219.20",
-                        onTap: () {},
-                        drawerContent: const [
-                          Text("Account #666777",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Balance:"),
-                              Text("\$9,219.20"),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("% of connection:"),
-                              Text("100%"),
+                              const Text("% of connection:"),
+                              Text("${connection.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
                             ],
                           ),
                         ],
-                      ),
-                    ],
+                      );
+                    }).toList(),
                   ),
                 ),
 
