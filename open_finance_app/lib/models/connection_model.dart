@@ -1,71 +1,72 @@
 class Connection {
-    Connection({
-        required this.clientId,
-        required this.numConnections,
-        required this.totalAmount,
-        required this.connections,
-        required this.timestamp,
-    });
+  Connection({
+    required this.clientId,
+    required this.numConnections,
+    required this.totalAmount,
+    required this.connections,
+    required this.timestamp,
+  });
 
-    final int? clientId;
-    final int? numConnections;
-    final double? totalAmount;
-    final List<ConnectionElement> connections;
-    final DateTime? timestamp;
+  final int? clientId;
+  final int? numConnections;
+  final double? totalAmount;
+  final List<ConnectionElement> connections;
+  final DateTime? timestamp;
 
-    factory Connection.fromJson(Map<String, dynamic> json){ 
-        return Connection(
-            clientId: json["clientID"],
-            numConnections: json["numConnections"],
-            totalAmount: json["totalAmount"],
-            connections: json["connections"] == null ? [] : List<ConnectionElement>.from(json["connections"]!.map((x) => ConnectionElement.fromJson(x))),
-            timestamp: DateTime.tryParse(json["timestamp"] ?? ""),
-        );
-    }
+  factory Connection.fromJson(Map<String, dynamic> json) {
+    return Connection(
+      clientId: json["clientID"],
+      numConnections: json["numConnections"],
+      totalAmount: json["totalAmount"]?.toDouble(),
+      connections: json["connections"] == null
+          ? []
+          : List<ConnectionElement>.from(
+              json["connections"]!.map((x) => ConnectionElement.fromJson(x))),
+      timestamp: DateTime.tryParse(json["timestamp"] ?? ""),
+    );
+  }
 
-    @override
-    String toString(){
-        return "$clientId, $numConnections, $totalAmount, $connections, $timestamp, ";
-    }
-
+  @override
+  String toString() {
+    return "$clientId, $numConnections, $totalAmount, $connections, $timestamp, ";
+  }
 }
 
 class ConnectionElement {
-    ConnectionElement({
-        required this.bankName,
-        required this.bankId,
-        required this.accountNumber,
-        required this.connectionId,
-        required this.connectionAmount,
-        required this.connectionPercentage,
-        required this.isActive,
-    });
+  ConnectionElement({
+    required this.bankName,
+    required this.bankId,
+    required this.accountNumber,
+    required this.connectionId,
+    required this.connectionAmount,
+    required this.connectionPercentage,
+    required this.isActive,
+  });
 
-    final String? bankName;
-    final int? bankId;
-    final int? accountNumber;
-    final int? connectionId;
-    final double? connectionAmount;
-    final double? connectionPercentage;
-    final bool? isActive;
+  final String? bankName;
+  final int? bankId;
+  final int? accountNumber;
+  final int? connectionId;
+  final double? connectionAmount;
+  final double? connectionPercentage;
+  final bool? isActive;
 
-    factory ConnectionElement.fromJson(Map<String, dynamic> json){ 
-        return ConnectionElement(
-            bankName: json["bankName"],
-            bankId: json["bankID"],
-            accountNumber: json["accountNumber"],
-            connectionId: json["connectionID"],
-            connectionAmount: json["connectionAmount"],
-            connectionPercentage: json["connectionPercentage"],
-            isActive: json["isActive"],
-        );
-    }
+  factory ConnectionElement.fromJson(Map<String, dynamic> json) {
+    return ConnectionElement(
+      bankName: json["bankName"],
+      bankId: json["bankID"],
+      accountNumber: json["accountNumber"],
+      connectionId: json["connectionID"],
+      connectionAmount: json["connectionAmount"]?.toDouble(),
+      connectionPercentage: json["connectionPercentage"]?.toDouble(),
+      isActive: json["isActive"],
+    );
+  }
 
-    @override
-    String toString(){
-        return "$bankName, $bankId, $accountNumber, $connectionId, $connectionAmount, $connectionPercentage, $isActive, ";
-    }
-
+  @override
+  String toString() {
+    return "$bankName, $bankId, $accountNumber, $connectionId, $connectionAmount, $connectionPercentage, $isActive, ";
+  }
 }
 
 /*

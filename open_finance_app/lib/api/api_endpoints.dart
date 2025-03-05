@@ -13,4 +13,9 @@ class ApiEndpoints {
   static String portfolioTotalAmount(int clientID) {
     return '$baseUrl/clients/$clientID/PortfolioTotalAmount';
   }
+
+  // endpoints for connections_screen.dart
+  static String connections(int clientID) {
+    return '$baseUrl/clients/$clientID/GetAllConnections';
+  }
 }
