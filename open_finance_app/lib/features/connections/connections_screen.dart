@@ -34,6 +34,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     _futureConnectionData = _fetchConnectionData(widget.clientID);
   }
 
+  // Fetch summary data from the API
   Future<SummaryData> _fetchSummaryData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.portfolioTotalAmount(clientID));
 
@@ -51,6 +52,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     }
   }
 
+ // Fetch connection data from the API
   Future<Connection> _fetchConnectionData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.connections(clientID));
 
@@ -66,6 +68,22 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     } catch (e) {
       throw Exception("Error fetching connection data: $e");
     }
+  }
+ 
+  // Group connections by bank ID
+  Map<int, List<ConnectionElement>> _groupConnectionsByBank(Connection connectionData) {
+    Map<int, List<ConnectionElement>> groupedConnections = {};
+    
+    for (var connection in connectionData.connections) {
+      if (connection.bankId != null) {
+        if (!groupedConnections.containsKey(connection.bankId)) {
+          groupedConnections[connection.bankId!] = [];
+        }
+        groupedConnections[connection.bankId!]!.add(connection);
+      }
+    }
+    
+    return groupedConnections;
   }
 
   @override
@@ -172,40 +190,56 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
-                    children: connectionData.connections.map((connection) {
-                      // Map icon based on bank name (you might want to improve this)
+                    children: _groupConnectionsByBank(connectionData).entries.map((entry) {
+                      // Get the first connection to use for the main display
+                      ConnectionElement primaryConnection = entry.value.first;
                       IconData iconData = Icons.account_balance;
-
-                      final formattedBalance = numberFormat.format(connection.connectionAmount ?? 0);
+                      
+                      // Calculate total amount for all accounts from this bank
+                      double totalBankAmount = entry.value.fold(
+                        0, (sum, connection) => sum + (connection.connectionAmount ?? 0)
+                      );
+                      
+                      final formattedBalance = numberFormat.format(totalBankAmount);
+                      
+                      // Check if any connections are active
+                      bool isActive = entry.value.any((conn) => conn.isActive == true);
 
                       return ConnectionItem(
                         iconData: iconData,
-                        bankName: connection.bankName ?? "Unknown Bank",
+                        bankName: primaryConnection.bankName ?? "Unknown Bank",
                         totalAccountBalance: formattedBalance,
-                        switchValue: connection.isActive ?? false,
+                        switchValue: isActive,
                         onSwitchChanged: (newValue) {
-                          // TODO: Implement API call to update connection status
+                          // TODO: Implement API call to update connection status for all accounts
                         },
-                        onTap: () {},
                         drawerContent: [
-                          Text(
-                            "Account #${connection.accountNumber}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Balance:"),
-                              Text(formattedBalance),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("% of connection:"),
-                              Text("${connection.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
-                            ],
-                          ),
+                          ...entry.value.map((account) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Account #${account.accountNumber}",
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Balance:"),
+                                    Text(numberFormat.format(account.connectionAmount ?? 0)),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("% of connection:"),
+                                    Text("${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            );
+                          }),
                         ],
                       );
                     }).toList(),
