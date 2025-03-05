@@ -77,15 +77,20 @@ class _ConnectionItemState extends State<ConnectionItem>
           title: Text(widget.bankName),
           subtitle: Text(widget.totalAccountBalance),
           onTap: widget.onTap,
-          trailing: widget.drawerContent != null
-              ? IconButton(
-                  icon: RotationTransition(
-                    turns: _iconTurn,
-                    child: const Icon(Icons.keyboard_arrow_down),
-                  ),
-                  onPressed: _toggleExpand,
-                )
-              : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget.drawerContent != null
+                  ? IconButton(
+                      icon: RotationTransition(
+                        turns: _iconTurn,
+                        child: const Icon(Icons.keyboard_arrow_down),
+                      ),
+                      onPressed: _toggleExpand,
+                    )
+                  : Container(),
+            ],
+          ),
         ),
         if (_isExpanded && widget.drawerContent != null)
           AnimatedContainer(
@@ -105,7 +110,6 @@ class _ConnectionItemState extends State<ConnectionItem>
               children: [
                 ...widget.drawerContent!,
                 const SizedBox(height: 12),
-                // Add a switch row at the bottom of the drawer
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
