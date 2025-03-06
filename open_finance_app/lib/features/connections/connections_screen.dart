@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/addconnection.dart';
 import 'package:open_finance_app/widgets/connection_item.dart';
 import 'package:open_finance_app/features/connections/add_connection_screen.dart';
 import 'package:open_finance_app/models/connection_model.dart';
+import 'package:open_finance_app/widgets/charts/pie_chart_widget.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final int clientID;
@@ -24,32 +23,12 @@ class ConnectionsScreen extends StatefulWidget {
 }
 
 class _ConnectionsScreenState extends State<ConnectionsScreen> {
-  late Future<SummaryData> _futureSummaryData;
   late Future<Connection> _futureConnectionData;
 
   @override
   void initState() {
     super.initState();
-    _futureSummaryData = _fetchSummaryData(widget.clientID);
     _futureConnectionData = _fetchConnectionData(widget.clientID);
-  }
-
-  // Fetch summary data from the API
-  Future<SummaryData> _fetchSummaryData(int clientID) async {
-    final url = Uri.parse(ApiEndpoints.portfolioTotalAmount(clientID));
-
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        return SummaryData.fromJson(decoded);
-      } else {
-        throw Exception(
-            "Failed to load summary data. Status: ${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error fetching data: $e");
-    }
   }
 
   Future<Connection> _fetchConnectionData(int clientID) async {
@@ -68,11 +47,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       throw Exception("Error fetching connection data: $e");
     }
   }
- 
-  // Group connections by bank ID
-  Map<int, List<ConnectionElement>> _groupConnectionsByBank(Connection connectionData) {
+
+  Map<int, List<ConnectionElement>> _groupConnectionsByBank(
+      Connection connectionData) {
     Map<int, List<ConnectionElement>> groupedConnections = {};
-    
+
     for (var connection in connectionData.connections) {
       if (connection.bankId != null) {
         if (!groupedConnections.containsKey(connection.bankId)) {
@@ -81,7 +60,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         groupedConnections[connection.bankId!]!.add(connection);
       }
     }
-    
     return groupedConnections;
   }
 
@@ -97,9 +75,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: FutureBuilder(
-          future: Future.wait([_futureSummaryData, _futureConnectionData]),
-          builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        child: FutureBuilder<Connection>(
+          future: _futureConnectionData,
+          builder: (context, AsyncSnapshot<Connection> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
@@ -110,9 +88,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                 ),
               );
             } else if (snapshot.hasData) {
-              final summaryData = snapshot.data![0] as SummaryData;
-              final connectionData = snapshot.data![1] as Connection;
-              return _buildConnectionsContent(summaryData, connectionData);
+              return _buildConnectionsContent(snapshot.data!);
             } else {
               return const Center(child: Text("No data available"));
             }
@@ -143,19 +119,45 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     );
   }
 
-  Widget _buildConnectionsContent(SummaryData summaryData, Connection connectionData) {
+  Widget _buildConnectionsContent(
+      Connection connectionData) {
     final numberFormat = NumberFormat.currency(symbol: '\$');
-    final totalGeral = summaryData.productTotals.fold<double>(
-      0.0,
-      (sum, prod) => sum + prod.total,
-    );
+
+    // Group connections by bank
+    final groupedConnections = _groupConnectionsByBank(connectionData);
+
+    // Create chart data for the pie chart
+    final List<ChartData> chartData = [];
+    final List<Color> bankColors = [
+      AppColors.primaryColor20,
+      AppColors.primaryColor30,
+      AppColors.primaryColor40,
+      AppColors.primaryColor50,
+    ];
+
+    int colorIndex = 0;
+    double totalAmount = 0;
+
+    for (var entry in groupedConnections.entries) {
+      final bankConnections = entry.value;
+      double bankTotal = bankConnections.fold(
+          0, (sum, connection) => sum + (connection.connectionAmount ?? 0));
+
+      totalAmount += bankTotal;
+
+      chartData.add(ChartData(
+        value: bankTotal,
+        color: bankColors[colorIndex % bankColors.length],
+      ));
+
+      colorIndex++;
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              _futureSummaryData = _fetchSummaryData(widget.clientID);
               _futureConnectionData = _fetchConnectionData(widget.clientID);
             });
           },
@@ -165,28 +167,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
               child: Column(
                 children: [
                   SizedBox(
-                    height: constraints.maxHeight * 0.5,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        PieChart(
-                          PieChartData(
-                            sections: _generateChartSections(summaryData),
-                            centerSpaceRadius: 120,
-                            sectionsSpace: 3,
-                          ),
-                        ),
-                        Text(
-                          numberFormat.format(totalGeral),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: PieChartWidget(
+                      data: chartData,
+                      centerSpaceRadius: 100,
+                      sectionRadius: 50,
+                      sectionsSpace: 3,
+                      centerText: numberFormat.format(totalAmount),
+                      height: constraints.maxHeight * 0.4,
+                      width: constraints.maxWidth * 0.9,
                     ),
                   ),
-
+                  const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -194,25 +185,31 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
-                      children: _groupConnectionsByBank(connectionData).entries.map((entry) {
+                      children: _groupConnectionsByBank(connectionData)
+                          .entries
+                          .map((entry) {
                         ConnectionElement primaryConnection = entry.value.first;
                         IconData iconData = Icons.account_balance;
-                        
+
                         double totalBankAmount = entry.value.fold(
-                          0, (sum, connection) => sum + (connection.connectionAmount ?? 0)
-                        );
-                        
-                        final formattedBalance = numberFormat.format(totalBankAmount);
-                        
-                        bool isActive = entry.value.any((conn) => conn.isActive == true);
+                            0,
+                            (sum, connection) =>
+                                sum + (connection.connectionAmount ?? 0));
+
+                        final formattedBalance =
+                            numberFormat.format(totalBankAmount);
+
+                        bool isActive =
+                            entry.value.any((conn) => conn.isActive == true);
 
                         return ConnectionItem(
                           iconData: iconData,
-                          bankName: primaryConnection.bankName ?? "Unknown Bank",
+                          bankName:
+                              primaryConnection.bankName ?? "Unknown Bank",
                           totalAccountBalance: formattedBalance,
                           switchValue: isActive,
                           onSwitchChanged: (newValue) {
-                            // TODO: Implement API call to update connection status for all accounts
+                            // TODO: Implement API call to update connection status on switch change
                           },
                           drawerContent: [
                             ...entry.value.map((account) {
@@ -221,20 +218,25 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                 children: [
                                   Text(
                                     "Account #${account.accountNumber}",
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       const Text("Balance:"),
-                                      Text(numberFormat.format(account.connectionAmount ?? 0)),
+                                      Text(numberFormat.format(
+                                          account.connectionAmount ?? 0)),
                                     ],
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       const Text("% of connection:"),
-                                      Text("${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
+                                      Text(
+                                          "${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
                                     ],
                                   ),
                                   const SizedBox(height: 16),
@@ -246,21 +248,20 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                       }).toList(),
                     ),
                   ),
-
                   AddConnectionButton(onTap: () async {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => AddConnectionScreen(
-                          clientID: widget.clientID, 
+                          clientID: widget.clientID,
                         ),
                       ),
                     );
-                    
+
                     if (result == true) {
                       setState(() {
-                        _futureSummaryData = _fetchSummaryData(widget.clientID);
-                        _futureConnectionData = _fetchConnectionData(widget.clientID);
+                        _futureConnectionData =
+                            _fetchConnectionData(widget.clientID);
                       });
                     }
                   }),
@@ -271,30 +272,5 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         );
       },
     );
-  }
-
-  List<PieChartSectionData> _generateChartSections(SummaryData summaryData) {
-    return summaryData.productTotals.map((product) {
-      Color color;
-      switch (product.product) {
-        case "Cash":
-          color = AppColors.accentGreen;
-          break;
-        case "Stock":
-          color = AppColors.accentYellow;
-          break;
-        case "Mutual Fund":
-          color = AppColors.accentRed;
-          break;
-        default:
-          color = Colors.blueGrey;
-      }
-      return PieChartSectionData(
-        value: product.total,
-        color: color,
-        radius: 50,
-        showTitle: false,
-      );
-    }).toList();
   }
 }
