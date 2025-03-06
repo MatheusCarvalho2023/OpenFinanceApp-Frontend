@@ -5,10 +5,10 @@ class ProductSummary extends StatelessWidget {
   final double value;
 
   const ProductSummary({
-    Key? key,
+    super.key,
     required this.productName,
     required this.value,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
