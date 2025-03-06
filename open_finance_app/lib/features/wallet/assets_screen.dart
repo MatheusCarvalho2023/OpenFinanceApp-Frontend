@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/features/wallet/assets_details_screen.dart';
 import 'package:open_finance_app/models/assets_model.dart';
 import 'package:open_finance_app/widgets/assets_card.dart';
 
@@ -76,13 +77,45 @@ class _AssetsScreenState extends State<AssetsScreen> {
 
   /// Build the content of the Assets screen
   Widget _buildAssetsContent(AssetsSummary assetsSummary) {
-    // A scrollable list of "cards" for each productDetail
+    // scrollable list of "assets_card" for each productDetail
     final products = assetsSummary.productDetails;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 0),
       child: Column(
-        // Map each productDetail to an AssetsCard widget
-        children: products.map((prod) => AssetsCard(product: prod)).toList(),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Number of products: ${assetsSummary.numProducts}",
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            "Total amount: ${assetsSummary.totalAmount}",
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AssetsDetailsScreen(
+                          clientID: widget.clientID,
+                          productName: product.productName,
+                        ),
+                      ),
+                    );
+                  },
+                  child: AssetsCard(product: product),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
