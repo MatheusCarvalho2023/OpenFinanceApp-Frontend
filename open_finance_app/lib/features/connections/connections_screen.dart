@@ -95,32 +95,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.primaryColor,
-        selectedItemColor: AppColors.secondaryColor,
-        unselectedItemColor: AppColors.textSecondary,
-        currentIndex: 1,
-        onTap: (index) {},
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.link),
-            label: 'Connections',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildConnectionsContent(
-      Connection connectionData) {
+  Widget _buildConnectionsContent(Connection connectionData) {
     final numberFormat = NumberFormat.currency(symbol: '\$');
 
     // Group connections by bank
@@ -155,6 +133,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Found RefreshIndicator is used to refresh screen
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {

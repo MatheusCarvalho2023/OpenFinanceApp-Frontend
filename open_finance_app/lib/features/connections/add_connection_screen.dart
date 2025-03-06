@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/wallet/summary_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/bankconnection_button.dart';
 import 'dart:convert';
@@ -8,7 +9,7 @@ import 'package:open_finance_app/features/connections/add_account_screen.dart';
 
 class AddConnectionScreen extends StatefulWidget {
   final int clientID;
-  
+
   const AddConnectionScreen({
     super.key,
     required this.clientID,
@@ -37,20 +38,22 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final url = Uri.parse(ApiEndpoints.banks);
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> banksJson = jsonDecode(response.body);
-        
+
         setState(() {
-          _banks = banksJson.map((bank) => {
-            'name': bank['bankName'] ?? 'Unknown Bank',
-            'logo': bank['logo'],
-            'bankID': bank['bankID'],
-          }).toList();
+          _banks = banksJson
+              .map((bank) => {
+                    'name': bank['bankName'] ?? 'Unknown Bank',
+                    'logo': bank['logo'],
+                    'bankID': bank['bankID'],
+                  })
+              .toList();
           _filteredBanks = List.from(_banks);
           _isLoading = false;
         });
@@ -77,20 +80,30 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   // Filters the banks based on the search query
   void _filterBanks() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredBanks = _banks.where((bank) => 
-        bank['name'].toString().toLowerCase().contains(query)).toList();
+      _filteredBanks = _banks
+          .where(
+              (bank) => bank['name'].toString().toLowerCase().contains(query))
+          .toList();
     });
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // TODO: Implement navigation
+      if (index == 0) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const SummaryScreen(clientID: 1)),
+        );
+      } else if (index == 2) {
+        Container(color: Colors.green); // TODO: Implement Profile screen
+      }
     });
   }
 
@@ -116,12 +129,13 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
         children: [
           // Search bar
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search for your bank...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
+                prefixIcon:
+                    const Icon(Icons.search, color: AppColors.primaryColor),
                 filled: true,
                 fillColor: AppColors.primaryBackground,
                 border: OutlineInputBorder(
@@ -132,27 +146,28 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
               ),
             ),
           ),
-          
-          _isLoading 
-            ? const Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            : Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _filteredBanks.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) => BankConnection(
-                    bankName: _filteredBanks[index]['name'],
-                    bankLogo: _filteredBanks[index]['logo'],
-                    isSelected: _selectedBankIndex == index,
-                    onTap: () => _selectBank(index),
+
+          _isLoading
+              ? const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _filteredBanks.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
+                    itemBuilder: (context, index) => BankConnection(
+                      bankName: _filteredBanks[index]['name'],
+                      bankLogo: _filteredBanks[index]['logo'],
+                      isSelected: _selectedBankIndex == index,
+                      onTap: () => _selectBank(index),
+                    ),
                   ),
                 ),
-              ),
-          
+
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: SizedBox(
@@ -160,12 +175,14 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
               child: ElevatedButton(
                 onPressed: _selectedBankIndex != null
                     ? () async {
-                        final selectedBank = _filteredBanks[_selectedBankIndex!];
+                        final selectedBank =
+                            _filteredBanks[_selectedBankIndex!];
                         final bankId = selectedBank['bankID'] as int;
                         final bankName = selectedBank['name'] as String;
-                        
-                        debugPrint('Connecting to bank: $bankName, bankID: $bankId');
-                        
+
+                        debugPrint(
+                            'Connecting to bank: $bankName, bankID: $bankId');
+
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -176,12 +193,13 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
                             ),
                           ),
                         );
-                        
+
                         if (result == true) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Account added successfully')),
+                            const SnackBar(
+                                content: Text('Account added successfully')),
                           );
-                          Navigator.pop(context, true); 
+                          Navigator.pop(context, true);
                         }
                       }
                     : null,

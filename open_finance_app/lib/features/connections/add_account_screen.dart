@@ -3,6 +3,8 @@ import 'package:open_finance_app/theme/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/widgets/tab_menu.dart';
+import 'package:open_finance_app/features/connections/connections_screen.dart';
 
 class AddAccountScreen extends StatefulWidget {
   final int bankId;
@@ -99,6 +101,29 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
     }
   }
 
+  void _onItemTapped(int index) {
+    if (index == 0) {
+      // Navigate to Home (TabMenu)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TabMenu(clientID: widget.clientID),
+        ),
+      );
+    } else if (index == 1) {
+      // Navigate to Connections
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConnectionsScreen(clientID: widget.clientID),
+        ),
+      );
+    } else if (index == 2) {
+      // Profile placeholder - same as in other screens
+      // Currently a placeholder in your codebase
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +196,27 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppColors.primaryColor,
+        selectedItemColor: AppColors.secondaryColor,
+        unselectedItemColor: AppColors.textSecondary,
+        currentIndex: 1, // Set to 1 since this is related to Connections tab
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.link),
+            label: 'Connections',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
