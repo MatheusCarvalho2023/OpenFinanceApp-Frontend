@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/models/assets_details_model.dart';
+import 'package:open_finance_app/services/api_service.dart';
 import 'package:open_finance_app/widgets/assets_card.dart';
 
 class AssetsDetailsScreen extends StatefulWidget {
@@ -26,22 +24,7 @@ class _AssetsDetailsScreenState extends State<AssetsDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _futureAssetsDetails = fetchAssetsDetails(widget.clientID);
-  }
-
-  Future<AssetsDetails> fetchAssetsDetails(int clientID) async {
-    final url = Uri.parse(ApiEndpoints.assetsDetails(clientID));
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        return AssetsDetails.fromJson(decoded);
-      } else {
-        throw Exception("Failed to load asset details: ${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error fetching asset details: $e");
-    }
+    _futureAssetsDetails = ApiService().fetchAssetsDetails(widget.clientID);
   }
 
   @override
