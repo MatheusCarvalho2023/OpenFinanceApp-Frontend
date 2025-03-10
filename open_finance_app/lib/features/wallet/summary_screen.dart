@@ -1,4 +1,5 @@
 import 'package:open_finance_app/models/summary_model.dart';
+import 'package:open_finance_app/services/api_service.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -30,31 +31,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
   void initState() {
     super.initState();
     // Fetch data from the backend using clientID
-    _futureSummaryData = fetchSummary(widget.clientID);
-  }
-
-  /// Function to call the backend API, passing the client ID.
-  Future<SummaryData> fetchSummary(int clientID) async {
-    // Update the URL to match the API endpoint
-    final url = Uri.parse(ApiEndpoints.portfolioTotalAmount(clientID));
-
-    try {
-      // Sends a GET request to the backend API
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // If the request is successful, decode the JSON response
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        // Convert JSON into the SummaryData model
-        return SummaryData.fromJson(decoded);
-      } else {
-        // If the server did not return a 200 OK response, throw an exception
-        throw Exception(
-            "Failed to load summary data. Status: ${response.statusCode}");
-      }
-    } catch (e) {
-      // Catch any network or parsing errors and throw an exception.
-      throw Exception("Error fetching data: $e");
-    }
+    _futureSummaryData = ApiService().fetchSummary(widget.clientID);
   }
 
   @override
