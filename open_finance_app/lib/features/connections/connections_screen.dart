@@ -218,6 +218,28 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                           "${account.connectionPercentage?.toStringAsFixed(2) ?? 0}%"),
                                     ],
                                   ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Enable account",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.75,
+                                        child: Switch(
+                                          value: account.isActive ?? false,
+                                          onChanged: (value) {
+                                            // TODO: Implement API call to update account status
+                                            // You'll need to add state management here
+                                          },
+                                          activeColor: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   const SizedBox(height: 16),
                                 ],
                               );
