@@ -2,11 +2,8 @@ import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/services/api_service.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/product_summary.dart';
 
 /// Display the total cash amount for a specific account by calling a backend API.
@@ -23,15 +20,44 @@ class SummaryScreen extends StatefulWidget {
   State<SummaryScreen> createState() => _SummaryScreenState();
 }
 
-class _SummaryScreenState extends State<SummaryScreen> {
+class _SummaryScreenState extends State<SummaryScreen>
+    with SingleTickerProviderStateMixin {
   // Future holds the async result of fetching SummaryData.
   late Future<SummaryData> _futureSummaryData;
+  late AnimationController _animationController;
+  late Animation<double> _chartAnimation;
 
   @override
   void initState() {
     super.initState();
     // Fetch data from the backend using clientID
     _futureSummaryData = ApiService().fetchSummary(widget.clientID);
+
+    // Initialize animation controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    // Create animations
+    _chartAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reset and start animations when tab becomes visible
+    _animationController.reset();
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -99,21 +125,37 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Render the pie chart using generated chart sections.
-                        PieChart(
-                          PieChartData(
-                            sections: _generateChartSections(summaryData),
-                            centerSpaceRadius: 120, // Size of the center hole
-                            sectionsSpace:
-                                3, // Space between pie chart sections.
-                          ),
+                        // Animated pie chart
+                        AnimatedBuilder(
+                          animation: _chartAnimation,
+                          builder: (context, child) {
+                            return PieChart(
+                              PieChartData(
+                                sections: _generateChartSections(summaryData),
+                                centerSpaceRadius: 120 * _chartAnimation.value,
+                                sectionsSpace: 3,
+                                startDegreeOffset:
+                                    270 - (360 * _chartAnimation.value),
+                                pieTouchData: PieTouchData(enabled: true),
+                              ),
+                              swapAnimationDuration:
+                                  const Duration(milliseconds: 800),
+                              swapAnimationCurve: Curves.easeInOutCubic,
+                            );
+                          },
                         ),
-                        // Display the total currency value in the center of the pie chart.
-                        Text(
-                          numberFormat.format(totalGeral),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        // Display the total currency value in the center with fade-in animation
+                        FadeTransition(
+                          opacity: _chartAnimation,
+                          child: ScaleTransition(
+                            scale: _chartAnimation,
+                            child: Text(
+                              numberFormat.format(totalGeral),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ],
