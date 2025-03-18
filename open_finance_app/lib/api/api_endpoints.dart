@@ -19,4 +19,9 @@ class ApiEndpoints {
   static String assetsDetails(int clientID) {
     return '$baseUrl/clients/$clientID/AssetsDetails';
   }
+
+  // endpoints for statements_screen.dart
+  static String statements(int clientID) {
+    return '$baseUrl/statement/$clientID/ClientStatement';
+  }
 }
