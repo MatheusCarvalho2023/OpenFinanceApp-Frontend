@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:open_finance_app/api/api_endpoints.dart';
+import 'package:open_finance_app/models/statement_model.dart';
 import 'package:open_finance_app/models/summary_model.dart';
 import 'package:open_finance_app/models/assets_model.dart';
 import 'package:open_finance_app/models/assets_details_model.dart';
@@ -55,6 +56,19 @@ class ApiService {
       return AssetsDetails.fromJson(decoded);
     } catch (e) {
       throw Exception('Error fetching asset details: $e');
+    }
+  }
+
+  // Fetch Statements
+  Future<ClientStatement> fetchStatements(int clientID) async {
+    final url = Uri.parse(ApiEndpoints.statements(clientID));
+    try {
+      final response = await http.get(url);
+      _handleResponse(response, 'Failed to load statements data');
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      return ClientStatement.fromJson(decoded);
+    } catch (e) {
+      throw Exception('Error fetching statements data: $e');
     }
   }
 }
