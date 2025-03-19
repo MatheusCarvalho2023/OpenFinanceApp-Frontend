@@ -85,17 +85,21 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       } else {
         debugPrint('Failed to update connection status: ${response.statusCode}');
         debugPrint('Response body: ${response.body}');
-        // If the API call fails, you might want to revert the UI change
-        // or show an error message to the user
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update connection status')),
-        );
+        // Check if mounted before showing a SnackBar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to update connection status')),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error updating connection status: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      // Check if mounted before showing a SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
