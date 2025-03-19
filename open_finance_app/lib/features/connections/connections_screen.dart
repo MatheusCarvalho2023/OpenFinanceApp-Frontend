@@ -63,6 +63,42 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     return groupedConnections;
   }
 
+  Future<void> _updateConnectionStatus(int connectionId, int clientId, bool status) async {
+    final url = Uri.parse(ApiEndpoints.updateStatusConnection());
+    
+    try {
+      final requestBody = {
+        "clientID": clientId,
+        "connectionID": connectionId,
+        "status": status
+      };
+      
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestBody),
+      );
+      
+      if (response.statusCode == 200) {
+        // Successfully updated on the backend
+        debugPrint('Connection status updated successfully');
+      } else {
+        debugPrint('Failed to update connection status: ${response.statusCode}');
+        debugPrint('Response body: ${response.body}');
+        // If the API call fails, you might want to revert the UI change
+        // or show an error message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update connection status')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error updating connection status: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -252,10 +288,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                               _futureConnectionData = Future.value(connectionData);
                                             });
                                             
-                                            // TODO: Implement API call to update account status on the backend
-                                            // Example API call (uncomment and modify as needed):
-                                            // final url = Uri.parse(ApiEndpoints.updateAccountStatus(account.connectionId));
-                                            // http.patch(url, body: jsonEncode({'isActive': value}));
+                                            // Make the API call to update account status on the backend
+                                            _updateConnectionStatus(account.connectionId!, widget.clientID, value);
                                           },
                                           activeColor: AppColors.primaryColor,
                                         ),
