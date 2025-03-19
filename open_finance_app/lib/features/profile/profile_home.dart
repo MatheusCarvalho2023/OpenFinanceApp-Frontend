@@ -52,10 +52,11 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
             PrimaryButton(
               text: "My Profile",
               onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const MyProfileScreen()),
-              );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MyProfileScreen(clientID: 1)),
+                );
               },
             ),
             const SizedBox(height: 16),
@@ -65,7 +66,8 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const MySecurityScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const MySecurityScreen()),
                 );
               },
             ),
