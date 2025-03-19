@@ -4,6 +4,8 @@ class ApiEndpoints {
 
   static const String login = '$baseUrl/authentication/login';
   static const String signup = '$baseUrl/authentication/signup';
+  static String banks = '$baseUrl/bankslist';
+  static String addConnection = '$baseUrl/clients/AddNewConnection';
 
   // endpoints for assets_screen.dart
   static String assetsSummary(int clientID) {
@@ -15,6 +17,15 @@ class ApiEndpoints {
     return '$baseUrl/clients/$clientID/PortfolioTotalAmount';
   }
 
+  // endpoints for connections_screen.dart
+  static String connections(int clientID) {
+    return '$baseUrl/clients/$clientID/GetAllConnections';
+  }
+
+  static String updateStatusConnection() {
+    return '$baseUrl/clients/EnableDisableConnection';
+  }
+  
   // endpoints for assets_details_screen.dart
   static String assetsDetails(int clientID) {
     return '$baseUrl/clients/$clientID/AssetsDetails';
