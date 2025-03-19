@@ -25,4 +25,9 @@ class ApiEndpoints {
   static String updateStatusConnection() {
     return '$baseUrl/clients/EnableDisableConnection';
   }
+  
+  // endpoints for assets_details_screen.dart
+  static String assetsDetails(int clientID) {
+    return '$baseUrl/clients/$clientID/AssetsDetails';
+  }
 }
