@@ -118,17 +118,22 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
 
     for (var entry in groupedConnections.entries) {
       final bankConnections = entry.value;
-      double bankTotal = bankConnections.fold(
-          0, (sum, connection) => sum + (connection.connectionAmount ?? 0));
+      // Only include active connections in the chart total
+      double bankTotal = bankConnections
+          .where((connection) => connection.isActive == true)
+          .fold(0, (sum, connection) => sum + (connection.connectionAmount ?? 0));
 
-      totalAmount += bankTotal;
+      // Only add to chart if the bank has active connections with non-zero amount
+      if (bankTotal > 0) {
+        totalAmount += bankTotal;
 
-      chartData.add(ChartData(
-        value: bankTotal,
-        color: bankColors[colorIndex % bankColors.length],
-      ));
+        chartData.add(ChartData(
+          value: bankTotal,
+          color: bankColors[colorIndex % bankColors.length],
+        ));
 
-      colorIndex++;
+        colorIndex++;
+      }
     }
 
     return LayoutBuilder(
@@ -185,7 +190,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                           iconData: iconData,
                           bankName:
                               primaryConnection.bankName ?? "Unknown Bank",
-                          totalAccountBalance: formattedBalance,
+                          // Only show active accounts in the main balance display
+                          totalAccountBalance: numberFormat.format(entry.value
+                              .where((conn) => conn.isActive == true)
+                              .fold(0.0, (sum, conn) => sum + (conn.connectionAmount ?? 0))),
                           switchValue: isActive,
                           onSwitchChanged: (newValue) {
                             // TODO: Implement API call to update connection status on switch change
@@ -232,8 +240,22 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                         child: Switch(
                                           value: account.isActive ?? false,
                                           onChanged: (value) {
-                                            // TODO: Implement API call to update account status
-                                            // You'll need to add state management here
+                                            // Update the local state immediately for UI feedback
+                                            setState(() {
+                                              // Find and update the specific account
+                                              for (var conn in connectionData.connections) {
+                                                if (conn.connectionId == account.connectionId) {
+                                                  conn.isActive = value;
+                                                }
+                                              }
+                                              // Refresh the UI
+                                              _futureConnectionData = Future.value(connectionData);
+                                            });
+                                            
+                                            // TODO: Implement API call to update account status on the backend
+                                            // Example API call (uncomment and modify as needed):
+                                            // final url = Uri.parse(ApiEndpoints.updateAccountStatus(account.connectionId));
+                                            // http.patch(url, body: jsonEncode({'isActive': value}));
                                           },
                                           activeColor: AppColors.primaryColor,
                                         ),
