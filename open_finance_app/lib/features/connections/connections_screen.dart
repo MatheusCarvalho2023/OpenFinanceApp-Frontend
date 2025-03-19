@@ -88,7 +88,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         // If the API call fails, you might want to revert the UI change
         // or show an error message to the user
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update connection status')),
+          const SnackBar(content: Text('Failed to update connection status')),
         );
       }
     } catch (e) {
@@ -147,6 +147,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       AppColors.primaryColor30,
       AppColors.primaryColor40,
       AppColors.primaryColor50,
+      AppColors.primaryColor60,
+      AppColors.primaryColor70,
+      AppColors.primaryColor80,
+      AppColors.primaryColor90,
     ];
 
     int colorIndex = 0;
@@ -159,7 +163,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
           .where((connection) => connection.isActive == true)
           .fold(0, (sum, connection) => sum + (connection.connectionAmount ?? 0));
 
-      // Only add to chart if the bank has active connections with non-zero amount
       if (bankTotal > 0) {
         totalAmount += bankTotal;
 
@@ -211,14 +214,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         ConnectionElement primaryConnection = entry.value.first;
                         IconData iconData = Icons.account_balance;
 
-                        double totalBankAmount = entry.value.fold(
-                            0,
-                            (sum, connection) =>
-                                sum + (connection.connectionAmount ?? 0));
-
-                        final formattedBalance =
-                            numberFormat.format(totalBankAmount);
-
                         bool isActive =
                             entry.value.any((conn) => conn.isActive == true);
 
@@ -232,7 +227,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                               .fold(0.0, (sum, conn) => sum + (conn.connectionAmount ?? 0))),
                           switchValue: isActive,
                           onSwitchChanged: (newValue) {
-                            // TODO: Implement API call to update connection status on switch change
+                            setState(() {
+                              for (var conn in entry.value) {
+                                conn.isActive = newValue;
+                              }
+                              _futureConnectionData = Future.value(connectionData);
+                            });
+
+                            // Make the API call to update account status on the backend
+                            for (var conn in entry.value) {
+                              _updateConnectionStatus(conn.connectionId!, widget.clientID, newValue);
+                            }
                           },
                           drawerContent: [
                             ...entry.value.map((account) {
@@ -276,7 +281,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                         child: Switch(
                                           value: account.isActive ?? false,
                                           onChanged: (value) {
-                                            // Update the local state immediately for UI feedback
                                             setState(() {
                                               // Find and update the specific account
                                               for (var conn in connectionData.connections) {
