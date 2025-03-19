@@ -21,4 +21,8 @@ class ApiEndpoints {
   static String connections(int clientID) {
     return '$baseUrl/clients/$clientID/GetAllConnections';
   }
+
+  static String updateStatusConnection() {
+    return '$baseUrl/clients/EnableDisableConnection';
+  }
 }

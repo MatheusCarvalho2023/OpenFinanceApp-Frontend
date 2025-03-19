@@ -107,33 +107,7 @@ class _ConnectionItemState extends State<ConnectionItem>
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...widget.drawerContent!,
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Disable connection",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Switch(
-                      value: _switchValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _switchValue = value;
-                        });
-                        if (widget.onSwitchChanged != null) {
-                          widget.onSwitchChanged!(value);
-                        }
-                      },
-                      activeColor: AppColors.primaryColor,
-                    ),
-                  ],
-                ),
-              ],
+              children: widget.drawerContent!,
             ),
           ),
       ],

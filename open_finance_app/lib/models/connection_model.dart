@@ -49,7 +49,7 @@ class ConnectionElement {
   final int? connectionId;
   final double? connectionAmount;
   final double? connectionPercentage;
-  final bool? isActive;
+  bool? isActive;
 
   factory ConnectionElement.fromJson(Map<String, dynamic> json) {
     return ConnectionElement(
