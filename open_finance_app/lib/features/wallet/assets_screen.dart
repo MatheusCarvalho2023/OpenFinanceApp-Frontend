@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/features/wallet/assets_details_screen.dart';
 import 'package:open_finance_app/models/assets_model.dart';
+import 'package:open_finance_app/services/api_service.dart';
 import 'package:open_finance_app/widgets/assets_card.dart';
 
 class AssetsScreen extends StatefulWidget {
@@ -23,26 +21,7 @@ class _AssetsScreenState extends State<AssetsScreen> {
   void initState() {
     super.initState();
     // Fetch data from the backend using clientID
-    _futureAssetsSummary = fetchAssetsSummary(widget.clientID);
-  }
-
-  /// Function to call the backend API, passing the client ID.
-  Future<AssetsSummary> fetchAssetsSummary(int clientID) async {
-    // Update the URL to match the API endpoint
-    final url = Uri.parse(ApiEndpoints.assetsSummary(clientID));
-    try {
-      // Sends a GET request to the backend API
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Parse JSON into AssetsSummary
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        return AssetsSummary.fromJson(decoded);
-      } else {
-        throw Exception("Failed to load assets data: ${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error fetching assets data: $e");
-    }
+    _futureAssetsSummary = ApiService().fetchAssetsSummary(widget.clientID);
   }
 
   @override
