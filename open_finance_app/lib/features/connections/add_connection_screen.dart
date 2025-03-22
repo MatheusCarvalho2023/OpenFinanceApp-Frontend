@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:open_finance_app/features/wallet/summary_screen.dart';
+import 'package:open_finance_app/navigation/main_navigation.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/models/bank_model.dart';
 import 'package:open_finance_app/services/bank_service.dart';
@@ -86,11 +86,11 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SummaryScreen(clientID: 1)),
+        MaterialPageRoute(builder: (context) => const MainNavigation(clientID: 1)),
       );
     } else if (index == 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile screen not yet implemented')),
+        const SnackBar(content: Text('Profile screen not yet implemented')), // TODO: ADD PROFILE SCREEN
       );
     }
   }
@@ -118,6 +118,7 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     );
 
     if (result == true) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account added successfully')),
       );
@@ -135,6 +136,7 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
           style: TextStyle(color: AppColors.textSecondary),
         ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: AppColors.textSecondary),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
