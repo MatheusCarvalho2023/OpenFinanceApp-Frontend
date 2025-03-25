@@ -26,7 +26,8 @@ class ApiEndpoints {
   // PATCH request to update client data
   static String updateClientData() {
     return '$baseUrl/clients/ClientProfile';
-
+  }
+  
   // endpoints for connections_screen.dart
   static String connections(int clientID) {
     return '$baseUrl/clients/$clientID/GetAllConnections';
