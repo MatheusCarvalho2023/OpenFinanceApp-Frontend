@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/profile/base_profile_screen.dart';
 import 'package:open_finance_app/features/profile/profile_home.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
@@ -8,53 +9,66 @@ import 'package:open_finance_app/api/api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-/// A screen that allows users to view and edit their profile information.
+/// MyProfileScreen displays and allows editing of user profile information
 ///
-/// This screen fetches and displays the user's profile data including name,
-/// email, and address. It also provides functionality to update this information.
-class MyProfileScreen extends StatefulWidget {
-  /// The unique identifier for the client.
-  ///
-  /// This ID is required to fetch the user's profile data from the backend.
+/// This screen provides a form for users to:
+/// - View their current profile details
+/// - Update their name, address, and email
+/// - Save changes to the backend API
+///
+/// Extends [BaseProfileScreen] to inherit the common navigation and UI structure
+class MyProfileScreen extends BaseProfileScreen {
+  /// The unique identifier for the client whose profile is being displayed
   final int clientID;
-
+  
+  /// Creates a MyProfileScreen instance
+  ///
+  /// The [clientID] parameter is required to fetch the correct client data
+  /// The [key] parameter is passed to the parent class constructor
   const MyProfileScreen({super.key, required this.clientID});
 
   @override
   State<MyProfileScreen> createState() => _MyProfileScreenState();
 }
 
-class _MyProfileScreenState extends State<MyProfileScreen> {
-  int _selectedIndex = 2;
+/// State management class for MyProfileScreen
+///
+/// Extends [BaseProfileScreenState] to inherit common profile screen behaviors
+/// including navigation bar and app bar functionality
+class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
+  /// Indicates whether data is currently being loaded or saved
   bool _isLoading = true;
 
-  // Text controllers for the form fields
+  /// Text controllers for the form fields
+  /// Used to access and update the text input values
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   final _emailController = TextEditingController();
 
-  /// Client data model containing user information.
+  /// Client data model containing user information
+  /// Stores the original data fetched from the API
   late Client _clientData;
 
   @override
   void initState() {
     super.initState();
+    // Load client data when the widget initializes
     _loadClientData();
   }
 
   @override
   void dispose() {
+    // Dispose of the text controllers to avoid memory leaks
     _nameController.dispose();
     _addressController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
-  /// Loads client data from the API and populates the form fields.
+  /// Loads client data from the API and populates the form fields
   ///
-  /// This method is called during initialization to fetch the client's
-  /// profile data from the backend API. It updates the form fields with
-  /// the fetched data once available.
+  /// Fetches the client information using the client ID and updates the UI
+  /// Shows error message if data fetching fails
   Future<void> _loadClientData() async {
     try {
       final client = await _fetchClientData(widget.clientID);
@@ -66,21 +80,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load profile: $e')),
       );
     }
   }
 
-  /// Fetches client data from the backend API.
+  /// Fetches client data from the backend API
   ///
-  /// [clientID] The unique identifier for the client.
+  /// Makes an HTTP GET request to the client data endpoint
+  /// Parses the JSON response into a Client object
   ///
-  /// Returns a [Client] object containing the client's profile information.
-  /// Throws an exception if the API request fails.
+  /// @param clientID The ID of the client to fetch
+  /// @return A Future containing the Client object with profile data
+  /// @throws Exception if the API request fails
   Future<Client> _fetchClientData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.getClientData(clientID));
     final response = await http.get(url);
@@ -92,11 +106,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
-  /// Updates the client's profile information on the backend.
+  /// Updates the client's profile information on the backend
   ///
-  /// This method collects the modified fields from the form, sends a PATCH
-  /// request to the API, and updates the local client data if successful.
-  /// Shows appropriate feedback messages based on the result.
+  /// Compares form values with original data to identify changes
+  /// Sends only modified fields to the API to minimize data transfer
+  /// Shows appropriate feedback messages based on the operation result
   Future<void> _updateClientProfile() async {
     setState(() => _isLoading = true);
 
@@ -121,7 +135,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
       // If nothing was changed, show message and return early
       if (updatedFields.length == 1) {
-        // Only contains clientID
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No changes detected')),
@@ -132,9 +145,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       final url = Uri.parse(ApiEndpoints.updateClientData());
       final response = await http.patch(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: json.encode(updatedFields),
       );
 
@@ -165,36 +176,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
-  /// Handles the bottom navigation bar item selection.
-  ///
-  /// Updates the selected index when a navigation tab is tapped.
-  /// TODO: Implement actual navigation to the corresponding screens.
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // TODO: Implement navigation
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        title: const Text(
-          "Good morning, John!",
-          style: TextStyle(color: AppColors.textSecondary),
-        ),
-        centerTitle: true,
-      ),
+      // Use the inherited appBar with consistent styling
+      appBar: buildAppBar("Good morning, John!"),
+      
+      // Show loading indicator while fetching data
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Profile section header
                   const Text(
                     "My Profile",
                     style: TextStyle(
@@ -205,14 +201,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Name
+                  // Name input field
+                  // Uses consistent styling with person icon
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: 'Name',
                       hintText: 'Enter your full name',
-                      prefixIcon: const Icon(Icons.person,
-                          color: AppColors.primaryColor),
+                      prefixIcon: const Icon(Icons.person, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -223,14 +219,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Address
+                  // Address input field
+                  // Uses consistent styling with home icon
                   TextField(
                     controller: _addressController,
                     decoration: InputDecoration(
                       labelText: 'Address',
                       hintText: 'Enter your address',
-                      prefixIcon:
-                          const Icon(Icons.home, color: AppColors.primaryColor),
+                      prefixIcon: const Icon(Icons.home, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -241,14 +237,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Email
+                  // Email input field
+                  // Uses consistent styling with email icon
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       hintText: 'Your email address',
-                      prefixIcon: const Icon(Icons.email,
-                          color: AppColors.primaryColor),
+                      prefixIcon: const Icon(Icons.email, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -259,31 +255,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Buttons Row
+                  // Action buttons row
+                  // Provides Cancel and Update options
                   Row(
                     children: [
-                      // Cancel Button
+                      // Cancel Button - returns to profile home
                       Expanded(
                         child: SecondaryButton(
                           text: 'Cancel',
                           onPressed: () {
                             Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProfileHomeScreen()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileHomeScreen()
+                              ),
+                            );
                           },
                         ),
                       ),
                       const SizedBox(width: 16),
 
-                      // Submit Button
+                      // Update Button - saves profile changes
                       Expanded(
                         child: PrimaryButton(
                           text: 'Update',
-                          onPressed: () {
-                            _updateClientProfile();
-                          },
+                          onPressed: () => _updateClientProfile(),
                         ),
                       ),
                     ],
@@ -291,27 +287,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ],
               ),
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.primaryColor,
-        selectedItemColor: AppColors.secondaryColor,
-        unselectedItemColor: AppColors.textSecondary,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.link),
-            label: 'Connections',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      // Use the inherited bottom navigation bar
+      bottomNavigationBar: buildBottomNavigationBar(),
     );
   }
 }

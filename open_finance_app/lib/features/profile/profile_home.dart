@@ -1,43 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/profile/base_profile_screen.dart';
 import 'package:open_finance_app/features/profile/profile_myprofile.dart';
 import 'package:open_finance_app/features/start_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-/// A screen that displays account settings and options for the user profile.
+/// ProfileHomeScreen displays the main profile page with account settings options
 ///
-/// This screen provides options for navigating to the user profile details
-/// screen and logging out of the application.
-class ProfileHomeScreen extends StatefulWidget {
+/// This screen provides users with access to:
+/// - My Profile section
+/// - Logout functionality
+///
+/// Extends [BaseProfileScreen] to inherit the common navigation and UI structure
+class ProfileHomeScreen extends BaseProfileScreen {
+  /// Creates a ProfileHomeScreen instance
+  ///
+  /// The [key] parameter is passed to the parent class constructor
   const ProfileHomeScreen({super.key});
 
   @override
   State<ProfileHomeScreen> createState() => _ProfileHomeScreenState();
 }
 
-class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
-  int _selectedIndex = 2;
-
-  /// Handles the navigation bar item selection.
+/// State management class for ProfileHomeScreen
+///
+/// Extends [BaseProfileScreenState] to inherit common profile screen behaviors
+/// including navigation bar and app bar functionality
+class _ProfileHomeScreenState
+    extends BaseProfileScreenState<ProfileHomeScreen> {
+  /// Shows a confirmation dialog for logout and handles the logout process
   ///
-  /// When a bottom navigation tab is tapped, this updates the selected index.
-  /// TODO: Implement actual navigation to the corresponding screens.
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // TODO: Implement navigation
-    });
-  }
-
-  /// Shows a confirmation dialog for logout and handles the logout process.
+  /// When confirmed, navigates to the StartScreen and removes all previous routes
+  /// from the navigation stack to prevent returning to authenticated screens
   ///
-  /// This method displays an AlertDialog that asks the user to confirm
-  /// their intention to log out. If confirmed, it clears user data and
-  /// navigates to the StartScreen.
+  /// @param context The BuildContext used for navigation and showing the dialog
   void _handleLogout(BuildContext context) {
-    // Show confirmation dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -46,16 +44,14 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
           content: const Text("Are you sure you want to logout?"),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                _clearUserData();
-
+                // Close the dialog first
                 Navigator.of(context).pop();
+                // Navigate to StartScreen and clear navigation history
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const StartScreen()),
@@ -70,34 +66,17 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
     );
   }
 
-  /// Clears all user data from SharedPreferences.
-  ///
-  /// This method is called when the user logs out to ensure
-  /// that no user data remains stored on the device.
-  void _clearUserData() {
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.clear();
-    });
-
-    debugPrint("User data cleared");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        title: const Text(
-          "Good morning, John!",
-          style: TextStyle(color: AppColors.textSecondary),
-        ),
-        centerTitle: true,
-      ),
+      // Use the inherited buildAppBar method with a personalized greeting
+      appBar: buildAppBar("Good morning, John!"),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Section title for account settings
             const Text(
               "Account Settings",
               style: TextStyle(
@@ -107,49 +86,33 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            // My Profile Button
+
+            // My Profile Button - navigates to the detailed profile screen
+            // Uses PrimaryButton for primary actions in the design system
             PrimaryButton(
               text: "My Profile",
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MyProfileScreen(clientID: 1)),
+                    builder: (context) => const MyProfileScreen(clientID: 1),
+                  ),
                 );
               },
             ),
             const SizedBox(height: 16),
-            // Logout Button
+
+            // Logout Button - triggers the logout confirmation dialog
+            // Uses SecondaryButton for secondary actions in the design system
             SecondaryButton(
               text: "Logout",
-              onPressed: () {
-                _handleLogout(context);
-              },
+              onPressed: () => _handleLogout(context),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.primaryColor,
-        selectedItemColor: AppColors.secondaryColor,
-        unselectedItemColor: AppColors.textSecondary,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.link),
-            label: 'Connections',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      // Use the inherited bottom navigation bar
+      bottomNavigationBar: buildBottomNavigationBar(),
     );
   }
 }
