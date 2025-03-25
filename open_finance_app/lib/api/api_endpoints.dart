@@ -17,6 +17,16 @@ class ApiEndpoints {
     return '$baseUrl/clients/$clientID/PortfolioTotalAmount';
   }
 
+  /// Endpoints for profile screen
+  // GET request to fetch client data
+  static String getClientData(int clientID) {
+    return '$baseUrl/clients/$clientID/ClientProfile';
+  }
+
+  // PATCH request to update client data
+  static String updateClientData() {
+    return '$baseUrl/clients/ClientProfile';
+
   // endpoints for connections_screen.dart
   static String connections(int clientID) {
     return '$baseUrl/clients/$clientID/GetAllConnections';
