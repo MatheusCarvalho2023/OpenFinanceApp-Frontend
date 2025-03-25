@@ -8,7 +8,14 @@ import 'package:open_finance_app/api/api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+/// A screen that allows users to view and edit their profile information.
+///
+/// This screen fetches and displays the user's profile data including name,
+/// email, and address. It also provides functionality to update this information.
 class MyProfileScreen extends StatefulWidget {
+  /// The unique identifier for the client.
+  ///
+  /// This ID is required to fetch the user's profile data from the backend.
   final int clientID;
 
   const MyProfileScreen({super.key, required this.clientID});
@@ -21,12 +28,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   int _selectedIndex = 2;
   bool _isLoading = true;
 
-  // Text controllers
+  // Text controllers for the form fields
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   final _emailController = TextEditingController();
 
-  // Client data
+  /// Client data model containing user information.
   late Client _clientData;
 
   @override
@@ -43,7 +50,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     super.dispose();
   }
 
-  // Fetch client data from API
+  /// Loads client data from the API and populates the form fields.
+  ///
+  /// This method is called during initialization to fetch the client's
+  /// profile data from the backend API. It updates the form fields with
+  /// the fetched data once available.
   Future<void> _loadClientData() async {
     try {
       final client = await _fetchClientData(widget.clientID);
@@ -64,6 +75,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
+  /// Fetches client data from the backend API.
+  ///
+  /// [clientID] The unique identifier for the client.
+  ///
+  /// Returns a [Client] object containing the client's profile information.
+  /// Throws an exception if the API request fails.
   Future<Client> _fetchClientData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.getClientData(clientID));
     final response = await http.get(url);
@@ -75,6 +92,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
+  /// Updates the client's profile information on the backend.
+  ///
+  /// This method collects the modified fields from the form, sends a PATCH
+  /// request to the API, and updates the local client data if successful.
+  /// Shows appropriate feedback messages based on the result.
   Future<void> _updateClientProfile() async {
     setState(() => _isLoading = true);
 
@@ -143,6 +165,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
+  /// Handles the bottom navigation bar item selection.
+  ///
+  /// Updates the selected index when a navigation tab is tapped.
+  /// TODO: Implement actual navigation to the corresponding screens.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
