@@ -5,6 +5,10 @@ import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 
+/// A screen that allows users to change their password and manage security settings.
+///
+/// This screen provides form fields for entering an existing password and a new password,
+/// as well as buttons to submit or cancel the password change operation.
 class MySecurityScreen extends StatefulWidget {
   const MySecurityScreen({super.key});
 
@@ -14,9 +18,16 @@ class MySecurityScreen extends StatefulWidget {
 
 class _MySecurityScreenState extends State<MySecurityScreen> {
   int _selectedIndex = 2;
+  
+  /// Controller for the old password input field.
   final _oldPasswordController = TextEditingController();
+  
+  /// Controller for the new password input field.
   final _newPasswordController = TextEditingController();
 
+  /// Handles the bottom navigation bar item selection.
+  ///
+  /// Updates the selected index when a navigation tab is tapped.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -57,7 +68,7 @@ class _MySecurityScreenState extends State<MySecurityScreen> {
             ),
             const SizedBox(height: 30),
 
-            // Old Password
+            // Old Password input field with validation
             PasswordInputField(
               controller: _oldPasswordController,
               validator: (value) {
@@ -69,7 +80,7 @@ class _MySecurityScreenState extends State<MySecurityScreen> {
             ),
             const SizedBox(height: 16),
 
-            // New Password
+            // New Password input field with validation
             PasswordInputField(
               controller: _newPasswordController,
               validator: (value) {
@@ -81,8 +92,7 @@ class _MySecurityScreenState extends State<MySecurityScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Confirm Password
-            // Buttons Row
+            // Action buttons for canceling or confirming the password change
             Row(
               children: [
                 // Cancel Button
