@@ -27,7 +27,7 @@ class ApiEndpoints {
   static String updateClientData() {
     return '$baseUrl/clients/ClientProfile';
   }
-  
+
   // endpoints for connections_screen.dart
   static String connections(int clientID) {
     return '$baseUrl/clients/$clientID/GetAllConnections';
@@ -36,7 +36,7 @@ class ApiEndpoints {
   static String updateStatusConnection() {
     return '$baseUrl/clients/EnableDisableConnection';
   }
-  
+
   // endpoints for assets_details_screen.dart
   static String assetsDetails(int clientID) {
     return '$baseUrl/clients/$clientID/AssetsDetails';
@@ -45,5 +45,10 @@ class ApiEndpoints {
   // endpoints for statements_screen.dart
   static String statements(int clientID) {
     return '$baseUrl/statement/$clientID/ClientStatement';
+  }
+
+  // endpoints for profit_report_screen.dart
+  static String profitReport(int clientID) {
+    return '$baseUrl/report/$clientID/ProfitReport';
   }
 }

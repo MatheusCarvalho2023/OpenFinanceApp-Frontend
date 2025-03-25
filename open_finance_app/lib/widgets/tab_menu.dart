@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/wallet/analysis_screen.dart';
+import 'package:open_finance_app/features/wallet/statements_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
 import 'package:open_finance_app/features/wallet/assets_screen.dart';
@@ -39,10 +41,8 @@ class TabMenu extends StatelessWidget {
           children: [
             SummaryScreen(clientID: clientID),
             AssetsScreen(clientID: clientID),
-            // AnalysisScreen() // se existir
-            // StatementsScreen() // se existir
-            Container(), // placeholder
-            Container(), // placeholder
+            AnalysisScreen(clientID: clientID),
+            StatementsScreen(clientID: clientID)
           ],
         ),
       ),
