@@ -6,11 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:open_finance_app/widgets/product_summary.dart';
 
-/// Display the total cash amount for a specific account by calling a backend API.
+/// Displays the total cash amount for a specific account by calling a backend API.
 class SummaryScreen extends StatefulWidget {
   final int clientID; // Client ID required to fetch data
 
-  // Constructor for SummaryScreen
   const SummaryScreen({
     super.key,
     required this.clientID, // Accepts client ID as input
@@ -22,15 +21,18 @@ class SummaryScreen extends StatefulWidget {
 
 class _SummaryScreenState extends State<SummaryScreen>
     with SingleTickerProviderStateMixin {
-  // Future holds the async result of fetching SummaryData.
+  // Future for fetching SummaryData
   late Future<SummaryData> _futureSummaryData;
+
+  // Animation controller
   late AnimationController _animationController;
-  late Animation<double> _chartAnimation;
+  late Animation<double> _pieAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Fetch data from the backend using clientID
+
+    // Fetch data from backend
     _futureSummaryData = ApiService().fetchSummary(widget.clientID);
 
     // Initialize animation controller
@@ -39,17 +41,17 @@ class _SummaryScreenState extends State<SummaryScreen>
       vsync: this,
     );
 
-    // Create animations
-    _chartAnimation = CurvedAnimation(
+    // Create a curved animation
+    _pieAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
+      curve: Curves.easeOutCubic,
     );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Reset and start animations when tab becomes visible
+    // Restart animations every time this screen becomes visible
     _animationController.reset();
     _animationController.forward();
   }
@@ -62,32 +64,24 @@ class _SummaryScreenState extends State<SummaryScreen>
 
   @override
   Widget build(BuildContext context) {
-    // There is no AppBar here as it is located on the WalletScreen
     return SafeArea(
-      // FutureBuilder to handle the async fetching of data
+      // FutureBuilder to handle async fetching of data
       child: FutureBuilder<SummaryData>(
         future: _futureSummaryData,
         builder: (context, snapshot) {
-          // Display a loading spinner while fetching data
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          }
-          // If an error occured, display the error message.
-          else if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Center(
               child: Text(
                 "Error: ${snapshot.error}",
                 style: const TextStyle(color: Colors.red),
               ),
             );
-          }
-          // If data has been fetched successfully, build the summary screen content.
-          else if (snapshot.hasData) {
+          } else if (snapshot.hasData) {
             final summaryData = snapshot.data!;
             return _buildSummaryContent(summaryData);
-          }
-          // In case there is no data available, show a default message.
-          else {
+          } else {
             return const Center(child: Text("No data available"));
           }
         },
@@ -95,60 +89,54 @@ class _SummaryScreenState extends State<SummaryScreen>
     );
   }
 
-  /// Build the content using LayoutBuilder + SingleChildScrollView
+  /// Builds the layout with a pie chart and product summaries
   Widget _buildSummaryContent(SummaryData summaryData) {
-    // Create a number format for currency, using the dollar symbol.
     final numberFormat = NumberFormat.currency(symbol: '\$');
 
-    // Sum of all values to display in the center of the pie chart
+    // Sum of all values in the chart
     final totalGeral = summaryData.productTotals.fold<double>(
       0.0,
       (sum, prod) => sum + prod.total,
     );
 
-    // LayoutBuilder was used to get the available dimensions.
-    // SingleChildScrollView + ConstrainedBox to take up at least all the vertical space, allowing scrolling if needed.
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
           child: ConstrainedBox(
-            // Ensure the minimum height is equal to the height of the screen
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Padding(
-              // Apply symmetric horizontal and vertical padding around the content.
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 children: [
-                  // PieChart takes up 50% of the available height
+                  // Takes up about half the available height
                   SizedBox(
                     height: constraints.maxHeight * 0.5,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Animated pie chart
+                        // Use AnimatedBuilder to animate the pie chart
                         AnimatedBuilder(
-                          animation: _chartAnimation,
+                          animation: _pieAnimation,
                           builder: (context, child) {
                             return PieChart(
                               PieChartData(
                                 sections: _generateChartSections(summaryData),
-                                centerSpaceRadius: 120 * _chartAnimation.value,
+                                // Animate center hole
+                                centerSpaceRadius: 120 * _pieAnimation.value,
                                 sectionsSpace: 3,
+                                // Animate the "unfolding"
                                 startDegreeOffset:
-                                    270 - (360 * _chartAnimation.value),
+                                    270 - (360 * _pieAnimation.value),
                                 pieTouchData: PieTouchData(enabled: true),
                               ),
-                              swapAnimationDuration:
-                                  const Duration(milliseconds: 800),
-                              swapAnimationCurve: Curves.easeInOutCubic,
                             );
                           },
                         ),
-                        // Display the total currency value in the center with fade-in animation
+                        // Center text: fade + scale transitions
                         FadeTransition(
-                          opacity: _chartAnimation,
+                          opacity: _pieAnimation,
                           child: ScaleTransition(
-                            scale: _chartAnimation,
+                            scale: _pieAnimation,
                             child: Text(
                               numberFormat.format(totalGeral),
                               style: const TextStyle(
@@ -162,10 +150,9 @@ class _SummaryScreenState extends State<SummaryScreen>
                     ),
                   ),
 
-                  // Space between the pie chart and the summary items.
                   const SizedBox(height: 20),
 
-                  // Container to display individual summary items
+                  // Product summaries
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -175,12 +162,12 @@ class _SummaryScreenState extends State<SummaryScreen>
                         BoxShadow(color: Colors.black12, blurRadius: 4),
                       ],
                     ),
-                    // Create a list of summary items for each product using .map()
                     child: Column(
                       children: summaryData.productTotals.map((product) {
-                        // Return a ProductSummary widget for each product.
                         return ProductSummary(
-                            productName: product.product, value: product.total);
+                          productName: product.product,
+                          value: product.total,
+                        );
                       }).toList(),
                     ),
                   ),
@@ -193,7 +180,7 @@ class _SummaryScreenState extends State<SummaryScreen>
     );
   }
 
-  /// Generate the sections for the PieChart associating each product with a color
+  /// Generates the sections for the PieChart
   List<PieChartSectionData> _generateChartSections(SummaryData summaryData) {
     return summaryData.productTotals.map((product) {
       Color color;
@@ -210,7 +197,6 @@ class _SummaryScreenState extends State<SummaryScreen>
         default:
           color = Colors.blueGrey;
       }
-      // Build the pie chart section
       return PieChartSectionData(
         value: product.total,
         color: color,
