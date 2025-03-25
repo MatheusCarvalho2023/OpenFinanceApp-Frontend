@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/features/profile/profile_myprofile.dart';
-import 'package:open_finance_app/features/profile/profile_security.dart';
+import 'package:open_finance_app/features/start_screen.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
-import 'package:open_finance_app/features/wallet/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileHomeScreen extends StatefulWidget {
   const ProfileHomeScreen({super.key});
@@ -21,6 +21,48 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
       _selectedIndex = index;
       // TODO: Implement navigation
     });
+  }
+
+  void _handleLogout(BuildContext context) {
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Logout"),
+          content: const Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                _clearUserData();
+
+                Navigator.of(context).pop();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StartScreen()),
+                  (route) => false,
+                );
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _clearUserData() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.clear();
+    });
+
+    debugPrint("User data cleared");
   }
 
   @override
@@ -60,27 +102,11 @@ class _ProfileHomeScreenState extends State<ProfileHomeScreen> {
               },
             ),
             const SizedBox(height: 16),
-            // Security Button
-            PrimaryButton(
-              text: "Security",
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MySecurityScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
             // Logout Button
             SecondaryButton(
               text: "Logout",
               onPressed: () {
-                // TODO: Implement logout functionality, but it changes to login screen for now
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
+                _handleLogout(context);
               },
             ),
           ],
