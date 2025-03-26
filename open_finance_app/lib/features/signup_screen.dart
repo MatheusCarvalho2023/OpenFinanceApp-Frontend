@@ -1,5 +1,10 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+/// User registration screen for the OpenFinance application.
+///
+/// This screen provides a form for new users to create an account by
+/// entering their personal information including name, address, email
+/// and a secure password.
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,6 +19,10 @@ import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
 import 'package:open_finance_app/features/wallet/login_screen.dart';
 
+/// A screen widget that allows new users to register for an account.
+///
+/// This screen presents a form with fields for full name, address,
+/// email, and password, with validation for each field.
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -21,23 +30,49 @@ class SignupScreen extends StatefulWidget {
   SignupScreenState createState() => SignupScreenState();
 }
 
+/// The state class for the SignupScreen.
 class SignupScreenState extends State<SignupScreen> {
+  /// Regular expression for password validation.
+  ///
+  /// Requires at least:
+  /// - 8 characters
+  /// - 1 uppercase letter
+  /// - 1 digit
+  /// - 1 special character (@, $, !, %, *, ?, &)
   static final RegExp _passwordRegex = RegExp(
     r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
   );
 
+  /// Regular expression for email validation.
+  ///
+  /// Validates standard email format with username, @ symbol, and domain.
   static final RegExp _emailRegex = RegExp(
     r'^[a-zA-Z0-9.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+',
   );
 
-  final _formKey = GlobalKey<
-      FormState>(); // https://docs.flutter.dev/cookbook/forms/validation
+  /// Key for the form to enable validation
+  final _formKey = GlobalKey<FormState>();
+  
+  /// Controller for the email text input
   final _emailController = TextEditingController();
+  
+  /// Controller for the password text input
   final _passwordController = TextEditingController();
+  
+  /// Controller for the full name text input
   final _fullnameController = TextEditingController();
+  
+  /// Controller for the address text input
   final _addressController = TextEditingController();
+  
+  /// Flag to indicate whether a signup request is in progress
   bool _isLoading = false;
 
+  /// Validates form data and submits it to create a new user account.
+  ///
+  /// This method validates all form fields, sends the registration request
+  /// to the backend API, and handles success or error responses. On successful
+  /// registration, redirects the user to the SummaryScreen.
   Future<void> _signupUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -241,6 +276,8 @@ class SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _fullnameController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 }

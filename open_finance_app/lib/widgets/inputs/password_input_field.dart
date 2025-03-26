@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 
-/// A reusable password input field with show/hide functionality
+/// A reusable password input field with show/hide functionality.
 ///
 /// This widget provides a consistent password input experience across the app with:
 /// - Password visibility toggle
@@ -9,38 +9,40 @@ import 'package:open_finance_app/theme/colors.dart';
 /// - Built-in validation support
 /// - Customizable hint text
 class PasswordInputField extends StatefulWidget {
-  /// Controller for accessing and manipulating the input field's text
+  /// Controller for accessing and manipulating the input field's text.
   final TextEditingController controller;
   
-  /// Optional validator function to check password validity
-  /// Returns error message string or null if validation passes
+  /// Optional validator function to check password validity.
+  ///
+  /// Returns error message string or null if validation passes.
   final String? Function(String?)? validator;
   
-  /// Optional hint text displayed when field is empty
+  /// Optional hint text displayed when field is empty.
   final String? hintText;
 
-  /// Creates a PasswordInputField widget
+  /// Creates a PasswordInputField widget.
   ///
-  /// The [controller] parameter is required to manage the text input
-  /// [validator] is optional but recommended for form validation
-  /// [hintText] allows customizing the placeholder text
+  /// The [controller] parameter is required to manage the text input.
+  /// [validator] is optional but recommended for form validation.
+  /// [hintText] allows customizing the placeholder text.
   const PasswordInputField({
-    Key? key,
+    super.key,
     required this.controller,
     this.validator,
     this.hintText,
-  }) : super(key: key);
+  });
 
   @override
   State<PasswordInputField> createState() => _PasswordInputFieldState();
 }
 
-/// State management class for PasswordInputField
+/// State management class for PasswordInputField.
 ///
-/// Handles the toggle between visible and obscured password text
+/// Handles the toggle between visible and obscured password text.
 class _PasswordInputFieldState extends State<PasswordInputField> {
-  /// Controls whether the password text is hidden (true) or visible (false)
-  /// Defaults to true for security
+  /// Controls whether the password text is hidden (true) or visible (false).
+  ///
+  /// Defaults to true for security.
   bool _obscureText = true;
 
   @override

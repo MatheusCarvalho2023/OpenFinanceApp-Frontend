@@ -1,3 +1,7 @@
+/// Screen that allows users to add a new bank account to their financial profile.
+///
+/// This screen presents a form where the user can enter their account number
+/// to connect a new bank account to the OpenFinance system.
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'dart:convert';
@@ -6,9 +10,18 @@ import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/tab_menu.dart';
 import 'package:open_finance_app/features/connections/connections_screen.dart';
 
+/// A screen widget that allows users to add a new bank account connection.
+///
+/// This screen takes the bank ID, name, and client ID as required parameters
+/// to establish a connection between the user's account and the selected bank.
 class AddAccountScreen extends StatefulWidget {
+  /// The unique identifier of the bank to connect to
   final int bankId;
+  
+  /// The display name of the bank
   final String bankName;
+  
+  /// The client's unique identifier
   final int clientID;
 
   const AddAccountScreen({
@@ -22,9 +35,15 @@ class AddAccountScreen extends StatefulWidget {
   State<AddAccountScreen> createState() => _AddAccountScreenState();
 }
 
+/// The state class for the AddAccountScreen.
 class _AddAccountScreenState extends State<AddAccountScreen> {
+  /// Key for the form to enable validation
   final _formKey = GlobalKey<FormState>();
+  
+  /// Controller for the account number text input
   final _accountNumberController = TextEditingController();
+  
+  /// Flag to indicate whether a network request is in progress
   bool _isLoading = false;
 
   @override
@@ -33,6 +52,10 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
     super.dispose();
   }
 
+  /// Validates and submits the form data to the API.
+  ///
+  /// This method validates the input, sends the account connection request
+  /// to the backend API, and handles success or error responses.
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -101,6 +124,9 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
     }
   }
 
+  /// Handles navigation when a bottom navigation item is tapped.
+  ///
+  /// [index] The index of the tapped navigation item.
   void _onItemTapped(int index) {
     if (index == 0) {
       // Navigate to Home (TabMenu)

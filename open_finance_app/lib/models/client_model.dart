@@ -35,6 +35,10 @@ class Client {
   /// 
   /// The JSON keys are expected to match the API response format:
   /// "clientID", "clientName", "clientEmail", "clientAddress".
+  /// 
+  /// [json] The map containing client data from the API.
+  /// 
+  /// Returns a new Client instance with properties populated from the JSON data.
   factory Client.fromJson(Map<String, dynamic> json) {
     return Client(
       clientId: json["clientID"],
@@ -48,6 +52,9 @@ class Client {
   /// 
   /// The resulting map uses the API expected keys:
   /// "clientID", "clientName", "clientEmail", "clientAddress".
+  /// 
+  /// Returns a Map<String, dynamic> containing the client's properties
+  /// in a format suitable for JSON serialization.
   Map<String, dynamic> toJson() => {
         "clientID": clientId,
         "clientName": clientName,
@@ -60,15 +67,16 @@ class Client {
   /// This is useful for debugging purposes.
   @override
   String toString() {
-    return "$clientId, $clientName, $clientEmail, $clientAddress, ";
+    return "Client(id: $clientId, name: $clientName, email: $clientEmail, address: $clientAddress)";
   }
 }
 
-/*
-Example JSON structure from API:
-{
-    "clientID": 1,
-    "clientName": "Fernando Test Account",
-    "clientEmail": "test@mail.com",
-    "clientAddress": "180 University Ave"
-}*/
+/// Example JSON structure from API:
+/// ```json
+/// {
+///     "clientID": 1,
+///     "clientName": "Fernando Test Account",
+///     "clientEmail": "test@mail.com",
+///     "clientAddress": "180 University Ave"
+/// }
+/// ```
