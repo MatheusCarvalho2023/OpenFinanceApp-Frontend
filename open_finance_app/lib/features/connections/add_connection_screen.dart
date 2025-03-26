@@ -1,3 +1,8 @@
+/// Screen that allows users to add a new financial connection.
+///
+/// This screen displays a list of available banks that users can connect to
+/// their OpenFinance account. Users can search for specific banks and select
+/// one to establish a new connection.
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/navigation/main_navigation.dart';
 import 'package:open_finance_app/theme/colors.dart';
@@ -6,7 +11,12 @@ import 'package:open_finance_app/services/bank_service.dart';
 import 'package:open_finance_app/widgets/bank_list.dart';
 import 'package:open_finance_app/features/connections/add_account_screen.dart';
 
+/// A screen widget that allows users to browse and select a bank to connect.
+///
+/// This screen presents a searchable list of supported banks and provides
+/// a way for users to establish a new financial connection with their selected bank.
 class AddConnectionScreen extends StatefulWidget {
+  /// The unique identifier of the client adding a connection
   final int clientID;
 
   const AddConnectionScreen({
@@ -18,13 +28,27 @@ class AddConnectionScreen extends StatefulWidget {
   State<AddConnectionScreen> createState() => _AddConnectionScreenState();
 }
 
+/// The state class for the AddConnectionScreen.
 class _AddConnectionScreenState extends State<AddConnectionScreen> {
+  /// Service for fetching bank data from the API
   final _bankService = BankService();
+  
+  /// Index for the bottom navigation bar
   int _selectedIndex = 1;
+  
+  /// Index of the currently selected bank in the list
   int? _selectedBankIndex;
+  
+  /// Controller for the search text input
   final TextEditingController _searchController = TextEditingController();
+  
+  /// Complete list of available banks
   List<Bank> _allBanks = [];
+  
+  /// Filtered list of banks based on search query
   List<Bank> _filteredBanks = [];
+  
+  /// Flag to indicate whether data is being loaded
   bool _isLoading = true;
 
   @override
@@ -34,6 +58,10 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     _searchController.addListener(_filterBanks);
   }
 
+  /// Fetches the list of available banks from the API.
+  ///
+  /// Updates the state with the fetched banks or displays an error message
+  /// if the request fails.
   Future<void> _loadBanks() async {
     setState(() {
       _isLoading = true;
@@ -55,6 +83,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     }
   }
 
+  /// Displays an error message to the user.
+  ///
+  /// [message] The error message to display.
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -67,6 +98,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     super.dispose();
   }
 
+  /// Filters the bank list based on the current search query.
+  ///
+  /// This method is called whenever the search text changes.
   void _filterBanks() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -76,6 +110,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     });
   }
 
+  /// Handles navigation when a bottom navigation item is tapped.
+  ///
+  /// [index] The index of the tapped navigation item.
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
     
@@ -95,12 +132,19 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     }
   }
 
+  /// Updates the selected bank when a user taps on a bank in the list.
+  ///
+  /// [index] The index of the selected bank in the filtered list.
   void _selectBank(int index) {
     setState(() {
       _selectedBankIndex = _selectedBankIndex == index ? null : index;
     });
   }
 
+  /// Navigates to the account connection screen for the selected bank.
+  ///
+  /// This method is called when the user taps the Connect button after
+  /// selecting a bank from the list.
   Future<void> _connectToSelectedBank() async {
     if (_selectedBankIndex == null) return;
     
@@ -158,6 +202,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     );
   }
 
+  /// Builds the search input field for filtering banks.
+  ///
+  /// Returns a styled TextField widget with search functionality.
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -178,6 +225,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     );
   }
 
+  /// Builds the connect button for proceeding with bank connection.
+  ///
+  /// Returns a styled button that's enabled only when a bank is selected.
   Widget _buildConnectButton() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -199,6 +249,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
     );
   }
 
+  /// Builds the bottom navigation bar for the screen.
+  ///
+  /// Returns a BottomNavigationBar with Home, Connections, and Profile tabs.
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
       backgroundColor: AppColors.primaryColor,

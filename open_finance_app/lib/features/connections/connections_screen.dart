@@ -1,3 +1,8 @@
+/// Screen that displays and manages a client's financial connections.
+///
+/// This screen shows a visual overview of the client's connected accounts using a pie chart,
+/// lists all bank connections, and provides functionality to add new connections or
+/// toggle existing ones on/off.
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +15,12 @@ import 'package:open_finance_app/features/connections/add_connection_screen.dart
 import 'package:open_finance_app/models/connection_model.dart';
 import 'package:open_finance_app/widgets/charts/pie_chart_widget.dart';
 
+/// A screen widget that displays a client's financial connections.
+///
+/// This screen shows an overview of connected bank accounts, their balances,
+/// and allows the user to manage these connections including enabling/disabling them.
 class ConnectionsScreen extends StatefulWidget {
+  /// The unique identifier of the client whose connections are displayed
   final int clientID;
 
   const ConnectionsScreen({
@@ -22,7 +32,9 @@ class ConnectionsScreen extends StatefulWidget {
   State<ConnectionsScreen> createState() => _ConnectionsScreenState();
 }
 
+/// The state class for the ConnectionsScreen.
 class _ConnectionsScreenState extends State<ConnectionsScreen> {
+  /// Future that holds the connection data to be displayed
   late Future<Connection> _futureConnectionData;
 
   @override
@@ -31,6 +43,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     _futureConnectionData = _fetchConnectionData(widget.clientID);
   }
 
+  /// Fetches connection data for a specific client from the API.
+  ///
+  /// [clientID] The unique identifier of the client whose connections to fetch.
+  /// Returns a Future that resolves to the Connection object containing all connection data.
   Future<Connection> _fetchConnectionData(int clientID) async {
     final url = Uri.parse(ApiEndpoints.connections(clientID));
 
@@ -48,6 +64,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     }
   }
 
+  /// Groups connection elements by their bank ID.
+  ///
+  /// [connectionData] The Connection object containing the connections to group.
+  /// Returns a Map where keys are bank IDs and values are lists of connections for that bank.
   Map<int, List<ConnectionElement>> _groupConnectionsByBank(
       Connection connectionData) {
     Map<int, List<ConnectionElement>> groupedConnections = {};
@@ -63,6 +83,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     return groupedConnections;
   }
 
+  /// Updates the active status of a connection via the API.
+  ///
+  /// [connectionId] The unique identifier of the connection to update.
+  /// [clientId] The unique identifier of the client who owns the connection.
+  /// [status] The new status (true for active, false for inactive).
   Future<void> _updateConnectionStatus(int connectionId, int clientId, bool status) async {
     final url = Uri.parse(ApiEndpoints.updateStatusConnection());
     
@@ -138,6 +163,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     );
   }
 
+  /// Builds the main content of the connections screen.
+  ///
+  /// [connectionData] The Connection object containing all the client's connections.
+  /// Returns a widget tree representing the UI for the connections screen.
   Widget _buildConnectionsContent(Connection connectionData) {
     final numberFormat = NumberFormat.currency(symbol: '\$');
 
