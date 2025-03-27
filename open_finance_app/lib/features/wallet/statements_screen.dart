@@ -4,9 +4,13 @@ import 'package:open_finance_app/widgets/statement_card.dart';
 import 'package:open_finance_app/models/statement_model.dart';
 import 'package:open_finance_app/services/api_service.dart';
 
+/// StatementsScreen displays client statements by month.
+/// It fetches the statement data from the API and displays each month's transactions.
 class StatementsScreen extends StatefulWidget {
+  /// The client ID used to fetch the statements.
   final int clientID;
 
+  /// Constructor for StatementsScreen.
   const StatementsScreen({super.key, required this.clientID});
 
   @override
@@ -14,12 +18,13 @@ class StatementsScreen extends StatefulWidget {
 }
 
 class _StatementsScreenState extends State<StatementsScreen> {
+  // Future holding the client statement data.
   late Future<ClientStatement> _futureClientStatement;
 
   @override
   void initState() {
     super.initState();
-    // Fetch the client statement data from the API
+    // Fetch the client statement data from the API using the client ID.
     _futureClientStatement = ApiService().fetchStatements(widget.clientID);
   }
 
@@ -29,11 +34,11 @@ class _StatementsScreenState extends State<StatementsScreen> {
       child: FutureBuilder<ClientStatement>(
         future: _futureClientStatement,
         builder: (context, snapshot) {
-          // Show a loading spinner while waiting for the data
+          // Show a loading spinner while waiting for data.
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          // If an error occurs, show an error message
+          // Display an error message if an error occurs.
           else if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -42,11 +47,11 @@ class _StatementsScreenState extends State<StatementsScreen> {
               ),
             );
           }
-          // If no data is available, show a message
+          // Show a message if no data is available.
           else if (!snapshot.hasData) {
             return const Center(child: Text("No data available"));
           }
-          // Otherwise, show the data
+          // Build the statements view using the fetched data.
           final clientStatement = snapshot.data!;
           return _buildStatements(clientStatement);
         },
@@ -54,23 +59,25 @@ class _StatementsScreenState extends State<StatementsScreen> {
     );
   }
 
-  /// Constructs content from the ClientStatement object
+  /// Constructs the widget tree for displaying statements.
+  /// Each month is displayed with a header followed by its transactions.
   Widget _buildStatements(ClientStatement clientStatement) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title for the statements section.
           const Text(
             'Statements',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          // For each month, show the month header and transactions
+          // Iterate over each month's data.
           for (final monthData in clientStatement.statement) ...[
             _buildMonthHeader(monthData.month),
             const SizedBox(height: 8),
-            // show each transaction in a card
+            // Iterate over each transaction within the month.
             for (final tx in monthData.transactions) ...[
               StatementCard(
                 title: tx.transactionType,
@@ -87,7 +94,8 @@ class _StatementsScreenState extends State<StatementsScreen> {
     );
   }
 
-  /// Simple widget to display the month and year.
+  /// Builds a header widget for a given month.
+  /// Displays the month and year in a stylized manner.
   Widget _buildMonthHeader(String monthYear) {
     return Center(
       child: Text(
