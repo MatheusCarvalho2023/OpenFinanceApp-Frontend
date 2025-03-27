@@ -2,15 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:open_finance_app/theme/colors.dart';
 
-/// A widget that displays a statement record in a card.
-/// It fills the horizontal space and shows relevant info
+/// A widget that displays a transaction statement in a card format.
+/// The card shows the transaction title, asset ticker, date, and amount.
 class StatementCard extends StatelessWidget {
+  /// The title of the transaction (e.g., "Buy", "Sell").
   final String title;
+
+  /// The asset ticker or symbol involved.
   final String ticker;
+
+  /// The date of the transaction.
   final DateTime date;
+
+  /// The monetary amount of the transaction.
   final double amount;
+
+  /// The currency in which the transaction was made.
   final String currency;
 
+  /// Constructs a [StatementCard] widget with the specified transaction details.
   const StatementCard({
     super.key,
     required this.title,
@@ -22,6 +32,7 @@ class StatementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Format the date and currency values.
     final dateFormat = DateFormat('MMM d, yyyy');
     final numberFormat = NumberFormat.currency(symbol: "\$");
 
@@ -39,19 +50,20 @@ class StatementCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Display transaction title.
           Text(
             title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          // A divider line across the container
+          // Divider for visual separation.
           const Divider(
             color: AppColors.dividerColor,
             thickness: 1,
             height: 1,
           ),
           const SizedBox(height: 8),
-          // Ticker & date in one row
+          // Row containing ticker and formatted amount.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -60,7 +72,7 @@ class StatementCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          // Second row: date, quantity, price
+          // Display the transaction date.
           Text(dateFormat.format(date)),
         ],
       ),
