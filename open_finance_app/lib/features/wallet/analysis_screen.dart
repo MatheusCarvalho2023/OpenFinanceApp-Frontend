@@ -6,11 +6,14 @@ import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/models/profit_report_model.dart';
 import 'package:open_finance_app/models/connection_model.dart';
 
-/// This screen shows a donut chart for Connections Distribution and
-/// a line chart for monthly performance.
+/// AnalysisScreen displays a donut chart for connections distribution and a
+/// line chart for monthly performance. It fetches data for profit reports and connections
+/// from the API based on the provided client ID.
 class AnalysisScreen extends StatefulWidget {
+  /// The client ID used for fetching data from the API.
   final int clientID;
 
+  /// Constructor for AnalysisScreen.
   const AnalysisScreen({super.key, required this.clientID});
 
   @override
@@ -19,12 +22,16 @@ class AnalysisScreen extends StatefulWidget {
 
 class _AnalysisScreenState extends State<AnalysisScreen>
     with SingleTickerProviderStateMixin {
+  // Animation controller for chart animations.
   late AnimationController _animationController;
+  // Curved animation for the pie (donut) chart.
   late Animation<double> _pieAnimation;
+  // Future that holds profit report data from the API.
   late Future<ProfitReport> _futureProfitReport;
+  // Future that holds connections data from the API.
   late Future<Connection> _futureConnections;
 
-  // Colors used for the donut slices
+  // Colors used for the different slices in the donut chart.
   final List<Color> _pieColors = [
     AppColors.accentGreen,
     AppColors.accentRed,
@@ -37,39 +44,41 @@ class _AnalysisScreenState extends State<AnalysisScreen>
   void initState() {
     super.initState();
 
-    // Set up animation controller
+    // Initialize animation controller with a duration of 1500ms.
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
+    // Create a curved animation for the donut chart.
     _pieAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOutCubic,
     );
 
-    // Start fetching data
+    // Start fetching profit report and connection data.
     _futureProfitReport = ApiService().fetchProfitReport(widget.clientID);
     _futureConnections = ApiService().fetchConnections(widget.clientID);
 
-    // Begin animation
+    // Begin the animation.
     _animationController.forward();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Restart animation each time this screen is shown
+    // Restart animation each time the screen is displayed.
     _animationController.reset();
     _animationController.forward();
   }
 
   @override
   void dispose() {
+    // Dispose of the animation controller to free resources.
     _animationController.dispose();
     super.dispose();
   }
 
-  // Calculates the interval for the Y-axis of the line chart.
+  /// Calculates the Y-axis interval for the line chart based on the range.
   double _calculateInterval(double minY, double maxY) {
     final range = (maxY - minY).abs();
     if (range < 1) {
@@ -89,40 +98,49 @@ class _AnalysisScreenState extends State<AnalysisScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get screen height for responsive layout.
     final screenHeight = MediaQuery.of(context).size.height;
 
     return SafeArea(
       child: Column(
         children: [
-          // Donut Chart
+          // Display the donut chart in the upper section.
           SizedBox(
             height: screenHeight * 0.4,
             child: FutureBuilder<Connection>(
               future: _futureConnections,
               builder: (context, snapshot) {
+                // Show loading indicator while data is being fetched.
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
+                  // Display error message if fetching fails.
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData) {
+                  // Show message if no data is available.
                   return const Center(child: Text('No data'));
                 }
+                // Build the animated donut chart with the connection data.
                 return _buildAnimatedPieChart(snapshot.data!);
               },
             ),
           ),
-          // Line Chart
+          // Display the line chart in the remaining space.
           Expanded(
             child: FutureBuilder<ProfitReport>(
               future: _futureProfitReport,
               builder: (context, snapshot) {
+                // Loading state.
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
+                  // Error state.
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData) {
+                  // No data state.
                   return const Center(child: Text('No data'));
                 }
+                // Build the line chart using the fetched profit report data.
                 return _buildLineChart(snapshot.data!);
               },
             ),
@@ -133,19 +151,24 @@ class _AnalysisScreenState extends State<AnalysisScreen>
   }
 
   /// Builds the animated donut chart (Connections Distribution) without center text.
+  /// Uses the [Connection] data to display the percentage distribution of connections.
   Widget _buildAnimatedPieChart(Connection connectionData) {
     final sections = <PieChartSectionData>[];
     final legendItems = <_LegendItem>[];
 
+    // Calculate total connections amount.
     final total = connectionData.totalAmount ?? 0;
     if (connectionData.connections.isNotEmpty && total > 0) {
       int colorIndex = 0;
+      // Iterate over each connection to create chart sections.
       for (final c in connectionData.connections) {
         final amount = c.connectionAmount ?? 0;
         if (amount <= 0) continue;
+        // Cycle through predefined colors for each slice.
         final color = _pieColors[colorIndex % _pieColors.length];
         colorIndex++;
         final percentage = (amount / total) * 100;
+        // Create a section for the donut chart.
         sections.add(
           PieChartSectionData(
             value: amount,
@@ -160,6 +183,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
             titlePositionPercentageOffset: 0.55,
           ),
         );
+        // Add corresponding legend item.
         legendItems.add(
           _LegendItem(
             color: color,
@@ -173,6 +197,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // Title for the chart.
           const Text(
             'Connections Distribution',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -181,7 +206,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
           Expanded(
             child: Column(
               children: [
-                // Animate the donut chart via AnimatedBuilder
+                // Animated builder to handle pie chart animation.
                 Expanded(
                   child: AnimatedBuilder(
                     animation: _pieAnimation,
@@ -210,7 +235,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Legend below the donut chart
+                // Legend displayed below the donut chart.
                 Wrap(
                   spacing: 16,
                   runSpacing: 10,
@@ -225,16 +250,18 @@ class _AnalysisScreenState extends State<AnalysisScreen>
     );
   }
 
-  /// Builds the static line chart for monthly performance.
+  /// Builds the static line chart for monthly performance using profit report data.
   Widget _buildLineChart(ProfitReport profitReport) {
     final distinct = <ProfitByMonth>[];
     final used = <String>{};
+    // Filter out duplicate report periods.
     for (final p in profitReport.profitReportByMonth) {
       if (!used.contains(p.reportPeriod)) {
         used.add(p.reportPeriod);
         distinct.add(p);
       }
     }
+    // Sort data chronologically based on report period.
     distinct.sort((a, b) {
       final partsA = a.reportPeriod.split('-');
       final partsB = b.reportPeriod.split('-');
@@ -247,6 +274,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
       }
       return 0;
     });
+    // Limit the number of months to display.
     const maxMonths = 5;
     if (distinct.length > maxMonths) {
       distinct.removeRange(0, distinct.length - maxMonths);
@@ -254,12 +282,14 @@ class _AnalysisScreenState extends State<AnalysisScreen>
     final spots = <FlSpot>[];
     double minValue = double.infinity;
     double maxValue = -double.infinity;
+    // Prepare data points for the line chart.
     for (int i = 0; i < distinct.length; i++) {
       final val = distinct[i].totalProfitLossPercentage;
       if (val < minValue) minValue = val;
       if (val > maxValue) maxValue = val;
       spots.add(FlSpot(i.toDouble(), val));
     }
+    // Calculate padding and intervals for Y-axis.
     final range = (maxValue - minValue).abs();
     final topPad = range * 0.15;
     final bottomPad = range * 0.2;
@@ -270,6 +300,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // Title for the line chart.
           const Text(
             'Performance Trend (% Return)',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -325,6 +356,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
                           final mm = int.tryParse(parts[0]) ?? 0;
                           final yyyy = int.tryParse(parts[1]) ?? 0;
                           final date = DateTime(yyyy, mm);
+                          // Rotate text slightly for better readability.
                           return Transform.rotate(
                             angle: -math.pi / 12,
                             child: Text(
@@ -365,6 +397,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
     );
   }
 
+  /// Returns the abbreviated month name given the month number.
   String _monthAbbr(int month) {
     const abbr = [
       'Jan',
@@ -383,10 +416,12 @@ class _AnalysisScreenState extends State<AnalysisScreen>
     return (month < 1 || month > 12) ? '' : abbr[month - 1];
   }
 
+  /// Builds a legend item widget for the donut chart.
   Widget _buildLegendItem(_LegendItem item) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Color indicator circle.
         Container(
           width: 14,
           height: 14,
@@ -396,15 +431,19 @@ class _AnalysisScreenState extends State<AnalysisScreen>
           ),
         ),
         const SizedBox(width: 6),
+        // Label for the legend item.
         Text(item.label, style: const TextStyle(fontSize: 14)),
       ],
     );
   }
 }
 
-/// Model for the donut chart legend.
+/// Private model class for representing a legend item in the donut chart.
 class _LegendItem {
+  /// Color of the legend indicator.
   final Color color;
+
+  /// Label for the legend item.
   final String label;
 
   _LegendItem({
