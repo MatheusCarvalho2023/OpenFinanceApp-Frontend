@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/widgets/tab_menu.dart';
 import 'package:open_finance_app/features/connections/connections_screen.dart';
+import 'package:open_finance_app/features/profile/profile_home.dart';
 
 /// This widget holds a BottomNavigationBar
 class MainNavigation extends StatefulWidget {
@@ -25,7 +26,7 @@ class _MainNavigationState extends State<MainNavigation> {
     _pages = [
       TabMenu(clientID: widget.clientID),
       ConnectionsScreen(clientID: widget.clientID),
-      Container(color: Colors.green), // placeholder
+      const ProfileHomeScreen(),
     ];
   }
 
