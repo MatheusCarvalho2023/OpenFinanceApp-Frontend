@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_finance_app/features/login/signup_screen.dart';
+import 'package:open_finance_app/navigation/main_navigation.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/api/api_endpoints.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
@@ -50,19 +52,8 @@ class LoginScreenState extends State<LoginScreen> {
           }),
         );
 
-        print('Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-
         if (response.statusCode == 200) {
-          print('Calling SummaryScreen');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SummaryScreen(
-                clientID: json.decode(response.body)['clientID'],
-              ),
-            ),
-          );
+          _handleSuccessfulLogin(json.decode(response.body)['clientID']);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed: ${response.body}')),
@@ -76,6 +67,15 @@ class LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _handleSuccessfulLogin(int clientId) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => MainNavigation(clientID: clientId),
+      ),
+      (route) => false,
+    );
   }
 
   @override
@@ -138,20 +138,20 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
 
                         // Forgot Password
-                        Align(
-                          alignment: Alignment.center,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed:
-                                () {}, // TODO: Implement forgot password logic
-                            child: const Text('Forgot my password'),
-                          ),
-                        ),
+                        // Align(
+                        //   alignment: Alignment.center,
+                        //   child: TextButton(
+                        //     style: TextButton.styleFrom(
+                        //       foregroundColor: AppColors.primaryColor,
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(12),
+                        //       ),
+                        //     ),
+                        //     onPressed:
+                        //         () {}, // Implement forgot password logic
+                        //     child: const Text('Forgot my password'),
+                        //   ),
+                        // ),
                         const SizedBox(height: 30),
 
                         // Buttons Row
@@ -162,7 +162,12 @@ class LoginScreenState extends State<LoginScreen> {
                                 child: SecondaryButton(
                               text: 'Sign Up',
                               onPressed: () {
-                                // Placeholder for navigation to Sign Up screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignupScreen(),
+                                  ),
+                                );
                               },
                             )),
                             const SizedBox(width: 20),

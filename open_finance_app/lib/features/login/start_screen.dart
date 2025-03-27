@@ -8,8 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
-import 'package:open_finance_app/features/signup_screen.dart';
-import 'package:open_finance_app/features/wallet/login_screen.dart';
+import 'package:open_finance_app/features/login/signup_screen.dart';
+import 'package:open_finance_app/features/login/login_screen.dart';
 
 /// A screen widget that serves as the initial landing page of the application.
 ///
