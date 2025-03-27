@@ -20,7 +20,7 @@ import 'package:http/http.dart' as http;
 class MyProfileScreen extends BaseProfileScreen {
   /// The unique identifier for the client whose profile is being displayed
   final int clientID;
-  
+
   /// Creates a MyProfileScreen instance
   ///
   /// The [clientID] parameter is required to fetch the correct client data
@@ -181,12 +181,13 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
     return Scaffold(
       // Use the inherited appBar with consistent styling
       appBar: buildAppBar("Good morning, John!"),
-      
+
       // Show loading indicator while fetching data
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -208,7 +209,8 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Name',
                       hintText: 'Enter your full name',
-                      prefixIcon: const Icon(Icons.person, color: AppColors.primaryColor),
+                      prefixIcon: const Icon(Icons.person,
+                          color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -226,7 +228,8 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Address',
                       hintText: 'Enter your address',
-                      prefixIcon: const Icon(Icons.home, color: AppColors.primaryColor),
+                      prefixIcon:
+                          const Icon(Icons.home, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -244,7 +247,8 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Email',
                       hintText: 'Your email address',
-                      prefixIcon: const Icon(Icons.email, color: AppColors.primaryColor),
+                      prefixIcon: const Icon(Icons.email,
+                          color: AppColors.primaryColor),
                       filled: true,
                       fillColor: AppColors.primaryBackground,
                       border: OutlineInputBorder(
@@ -264,11 +268,11 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
                         child: SecondaryButton(
                           text: 'Cancel',
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.pop(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ProfileHomeScreen()
-                              ),
+                                  builder: (context) =>
+                                      const ProfileHomeScreen()),
                             );
                           },
                         ),
@@ -287,8 +291,6 @@ class _MyProfileScreenState extends BaseProfileScreenState<MyProfileScreen> {
                 ],
               ),
             ),
-      // Use the inherited bottom navigation bar
-      bottomNavigationBar: buildBottomNavigationBar(),
     );
   }
 }

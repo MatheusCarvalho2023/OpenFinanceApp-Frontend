@@ -114,7 +114,7 @@ class _MySecurityScreenState extends BaseProfileScreenState<MySecurityScreen> {
                   child: SecondaryButton(
                     text: 'Cancel',
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.pop(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const ProfileHomeScreen()
@@ -137,8 +137,6 @@ class _MySecurityScreenState extends BaseProfileScreenState<MySecurityScreen> {
           ],
         ),
       ),
-      // Use the inherited bottom navigation bar
-      bottomNavigationBar: buildBottomNavigationBar(),
     );
   }
 }

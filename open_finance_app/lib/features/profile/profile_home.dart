@@ -92,7 +92,7 @@ class _ProfileHomeScreenState
             PrimaryButton(
               text: "My Profile",
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const MyProfileScreen(clientID: 1),
@@ -111,8 +111,6 @@ class _ProfileHomeScreenState
           ],
         ),
       ),
-      // Use the inherited bottom navigation bar
-      bottomNavigationBar: buildBottomNavigationBar(),
     );
   }
 }
