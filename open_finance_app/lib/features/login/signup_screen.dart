@@ -17,7 +17,7 @@ import 'package:open_finance_app/widgets/inputs/password_input_field.dart';
 import 'package:open_finance_app/widgets/buttons/primary_button.dart';
 import 'package:open_finance_app/widgets/buttons/secondary_button.dart';
 import 'package:open_finance_app/features/wallet/summary_screen.dart';
-import 'package:open_finance_app/features/wallet/login_screen.dart';
+import 'package:open_finance_app/features/login/login_screen.dart';
 
 /// A screen widget that allows new users to register for an account.
 ///

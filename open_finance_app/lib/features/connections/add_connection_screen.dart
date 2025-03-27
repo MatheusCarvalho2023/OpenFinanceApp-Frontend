@@ -4,6 +4,7 @@
 /// their OpenFinance account. Users can search for specific banks and select
 /// one to establish a new connection.
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/profile/profile_home.dart';
 import 'package:open_finance_app/navigation/main_navigation.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'package:open_finance_app/models/bank_model.dart';
@@ -32,22 +33,22 @@ class AddConnectionScreen extends StatefulWidget {
 class _AddConnectionScreenState extends State<AddConnectionScreen> {
   /// Service for fetching bank data from the API
   final _bankService = BankService();
-  
+
   /// Index for the bottom navigation bar
   int _selectedIndex = 1;
-  
+
   /// Index of the currently selected bank in the list
   int? _selectedBankIndex;
-  
+
   /// Controller for the search text input
   final TextEditingController _searchController = TextEditingController();
-  
+
   /// Complete list of available banks
   List<Bank> _allBanks = [];
-  
+
   /// Filtered list of banks based on search query
   List<Bank> _filteredBanks = [];
-  
+
   /// Flag to indicate whether data is being loaded
   bool _isLoading = true;
 
@@ -69,7 +70,7 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
 
     try {
       final banks = await _bankService.fetchBanks();
-      
+
       setState(() {
         _allBanks = banks;
         _filteredBanks = List.from(banks);
@@ -115,19 +116,21 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
   /// [index] The index of the tapped navigation item.
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
-    
+
     setState(() {
       _selectedIndex = index;
     });
-    
+
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MainNavigation(clientID: 1)),
+        MaterialPageRoute(
+            builder: (context) => const MainNavigation(clientID: 1)),
       );
     } else if (index == 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile screen not yet implemented')), // TODO: ADD PROFILE SCREEN
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileHomeScreen()),
       );
     }
   }
@@ -147,9 +150,9 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
   /// selecting a bank from the list.
   Future<void> _connectToSelectedBank() async {
     if (_selectedBankIndex == null) return;
-    
+
     final selectedBank = _filteredBanks[_selectedBankIndex!];
-    
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -187,7 +190,8 @@ class _AddConnectionScreenState extends State<AddConnectionScreen> {
         children: [
           _buildSearchBar(),
           _isLoading
-              ? const Expanded(child: Center(child: CircularProgressIndicator()))
+              ? const Expanded(
+                  child: Center(child: CircularProgressIndicator()))
               : Expanded(
                   child: BankList(
                     banks: _filteredBanks,

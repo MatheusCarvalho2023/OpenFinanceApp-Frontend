@@ -2,7 +2,11 @@
 ///
 /// This screen presents a form where the user can enter their account number
 /// to connect a new bank account to the OpenFinance system.
+library;
 import 'package:flutter/material.dart';
+import 'package:open_finance_app/features/profile/profile_home.dart';
+import 'package:open_finance_app/features/wallet/summary_screen.dart';
+import 'package:open_finance_app/navigation/main_navigation.dart';
 import 'package:open_finance_app/theme/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -133,7 +137,7 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => TabMenu(clientID: widget.clientID),
+          builder: (context) => MainNavigation(clientID: widget.clientID),
         ),
       );
     } else if (index == 1) {
@@ -145,8 +149,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
         ),
       );
     } else if (index == 2) {
-      // Profile placeholder - same as in other screens
-      // Currently a placeholder in your codebase
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ProfileHomeScreen(),
+        ),
+      );
     }
   }
 
