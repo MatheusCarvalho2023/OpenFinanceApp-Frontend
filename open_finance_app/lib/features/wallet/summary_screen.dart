@@ -103,8 +103,21 @@ class _SummaryScreenState extends State<SummaryScreen>
     // Format numbers as currency.
     final numberFormat = NumberFormat.currency(symbol: '\$');
 
-    // Calculate total value from all product totals.
-    final totalGeral = summaryData.productTotals.fold<double>(
+    // Define the expected product types
+    final expectedProducts = ["Cash", "Stock", "Mutual Fund"];
+
+    // Create a new list of product totals, ensuring all expected products are included
+    final allProductTotals = <ProductTotal>[];
+    for (var productName in expectedProducts) {
+      final existingProduct = summaryData.productTotals.firstWhere(
+        (p) => p.product == productName,
+        orElse: () => ProductTotal(product: productName, total: 0.0),
+      );
+      allProductTotals.add(existingProduct);
+    }
+
+    // Calculate total value from all product totals (including the default 0 values)
+    final totalGeral = allProductTotals.fold<double>(
       0.0,
       (sum, prod) => sum + prod.total,
     );
@@ -130,7 +143,14 @@ class _SummaryScreenState extends State<SummaryScreen>
                           builder: (context, child) {
                             return PieChart(
                               PieChartData(
-                                sections: _generateChartSections(summaryData),
+                                sections: _generateChartSections(
+                                  SummaryData(
+                                    clientID: summaryData.clientID,
+                                    totalAmount: summaryData.totalAmount,
+                                    timestamp: summaryData.timestamp,
+                                    productTotals: allProductTotals,
+                                  ),
+                                ),
                                 // Animate the center hole of the pie chart.
                                 centerSpaceRadius: 120 * _pieAnimation.value,
                                 sectionsSpace: 3,
@@ -171,7 +191,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                       ],
                     ),
                     child: Column(
-                      children: summaryData.productTotals.map((product) {
+                      children: allProductTotals.map((product) {
                         return ProductSummary(
                           productName: product.product,
                           value: product.total,
