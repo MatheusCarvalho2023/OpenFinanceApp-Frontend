@@ -10,10 +10,14 @@ import 'package:open_finance_app/models/assets_model.dart';
 import 'package:open_finance_app/models/assets_details_model.dart';
 import 'package:open_finance_app/models/statement_model.dart';
 
+/// Group of tests for verifying the ApiService methods.
 void main() {
   group('ApiService', () {
-    test('fetchProfitReport returns a valid ProfitReport on success', () async {
-      // Arrange
+    /// Test: fetchProfitReport_ValidClientID_ReturnsProfitReport
+    /// Given a valid clientID and a successful HTTP (200) response containing profit report JSON,
+    /// the fetchProfitReport method should return a correctly parsed ProfitReport object.
+    test('fetchProfitReport_ValidClientID_ReturnsProfitReport', () async {
+      // Arrange: Set up a mock HTTP client that returns sample profit report JSON.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -30,35 +34,37 @@ void main() {
         };
         return http.Response(jsonEncode(jsonMap), 200);
       });
-
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Call fetchProfitReport with a valid client ID.
       final report = await apiService.fetchProfitReport(1);
 
-      // Assert
+      // Assert: Verify that the returned object is a ProfitReport with correct data.
       expect(report, isA<ProfitReport>());
       expect(report.clientID, 1);
       expect(report.profitReportByMonth.length, 1);
       expect(report.profitReportByMonth.first.reportPeriod, "01-2025");
     });
 
-    test('fetchProfitReport throws exception on non-200 status', () async {
-      // Arrange
+    /// Test: fetchProfitReport_Non200Status_ThrowsException
+    /// Given a non-200 HTTP response, fetchProfitReport should throw an exception.
+    test('fetchProfitReport_Non200Status_ThrowsException', () async {
+      // Arrange: Create a mock client that simulates a 500 Server Error.
       final mockClient = MockClient((request) async {
         return http.Response('Server Error', 500);
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act & Assert
+      // Act & Assert: Verify that calling fetchProfitReport results in an exception.
       expect(
-        () async => await apiService.fetchProfitReport(1),
-        throwsException,
-      );
+          () async => await apiService.fetchProfitReport(1), throwsException);
     });
 
-    test('fetchConnections returns a valid Connection on success', () async {
-      // Arrange
+    /// Test: fetchConnections_ValidClientID_ReturnsConnection
+    /// Given a valid clientID and a successful response with connection JSON,
+    /// fetchConnections should return a correctly parsed Connection object.
+    test('fetchConnections_ValidClientID_ReturnsConnection', () async {
+      // Arrange: Set up sample JSON for connection data.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -81,18 +87,20 @@ void main() {
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Fetch connection data for clientID 1.
       final connection = await apiService.fetchConnections(1);
 
-      // Assert
+      // Assert: Verify that the returned Connection object is valid.
       expect(connection, isA<Connection>());
       expect(connection.clientId, 1);
       expect(connection.connections.length, 1);
       expect(connection.connections.first.bankName, "Royal Bank of Canada");
     });
 
-    test('fetchSummary returns SummaryData on success', () async {
-      // Arrange
+    /// Test: fetchSummary_ValidClientID_ReturnsSummaryData
+    /// Given a valid summary JSON response, fetchSummary should return a correctly parsed SummaryData object.
+    test('fetchSummary_ValidClientID_ReturnsSummaryData', () async {
+      // Arrange: Create sample JSON for summary data.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -106,18 +114,20 @@ void main() {
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Call fetchSummary.
       final summary = await apiService.fetchSummary(1);
 
-      // Assert
+      // Assert: Verify that the SummaryData object contains the expected values.
       expect(summary, isA<SummaryData>());
       expect(summary.clientID, 1);
       expect(summary.productTotals.first.product, "Stock");
       expect(summary.productTotals.first.total, 8000.0);
     });
 
-    test('fetchAssetsSummary returns AssetsSummary on success', () async {
-      // Arrange
+    /// Test: fetchAssetsSummary_ValidClientID_ReturnsAssetsSummary
+    /// Given valid JSON for asset summary, fetchAssetsSummary should return an AssetsSummary object.
+    test('fetchAssetsSummary_ValidClientID_ReturnsAssetsSummary', () async {
+      // Arrange: Provide sample JSON for asset summary.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -136,18 +146,20 @@ void main() {
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Fetch asset summary.
       final assetsSummary = await apiService.fetchAssetsSummary(1);
 
-      // Assert
+      // Assert: Verify that the returned AssetsSummary data is correct.
       expect(assetsSummary, isA<AssetsSummary>());
       expect(assetsSummary.clientID, 1);
       expect(assetsSummary.numProducts, 2);
       expect(assetsSummary.productDetails.first.productName, "Mutual Fund");
     });
 
-    test('fetchAssetsDetails returns AssetsDetails on success', () async {
-      // Arrange
+    /// Test: fetchAssetsDetails_ValidClientID_ReturnsAssetsDetails
+    /// Given valid JSON for asset details, fetchAssetsDetails should return an AssetsDetails object.
+    test('fetchAssetsDetails_ValidClientID_ReturnsAssetsDetails', () async {
+      // Arrange: Provide sample JSON for asset details.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -171,18 +183,20 @@ void main() {
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Fetch asset details.
       final assetsDetails = await apiService.fetchAssetsDetails(1);
 
-      // Assert
+      // Assert: Verify that the returned AssetsDetails object contains correct data.
       expect(assetsDetails, isA<AssetsDetails>());
       expect(assetsDetails.clientID, 1);
       expect(assetsDetails.numProducts, 1);
       expect(assetsDetails.products.first.productName, "Stock");
     });
 
-    test('fetchStatements returns ClientStatement on success', () async {
-      // Arrange
+    /// Test: fetchStatements_ValidClientID_ReturnsClientStatement
+    /// Given valid JSON for client statements, fetchStatements should return a ClientStatement object.
+    test('fetchStatements_ValidClientID_ReturnsClientStatement', () async {
+      // Arrange: Provide sample JSON for client statements.
       final mockClient = MockClient((request) async {
         final jsonMap = {
           "clientID": 1,
@@ -208,10 +222,10 @@ void main() {
       });
       final apiService = ApiService(client: mockClient);
 
-      // Act
+      // Act: Fetch statements for clientID 1.
       final statements = await apiService.fetchStatements(1);
 
-      // Assert
+      // Assert: Verify that the returned ClientStatement object is correct.
       expect(statements, isA<ClientStatement>());
       expect(statements.clientID, 1);
       expect(statements.statement.first.month, "March");
