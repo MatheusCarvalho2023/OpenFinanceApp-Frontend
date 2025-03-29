@@ -15,11 +15,8 @@ import 'package:open_finance_app/models/summary_model.dart';
 /// and serialization for all models in the application.
 void main() {
   group('Model Tests', () {
-    /// Tests the [AssetsDetails] model's fromJson method.
-    /// This test checks that the model correctly parses a sample JSON map
-    /// into an [AssetsDetails] instance, including nested product and item data.
-    test('AssetsDetails.fromJson should parse correctly', () {
-      // Sample JSON representing detailed asset information.
+    // Test AssetsDetails.fromJson: Given valid JSON, it should return a correctly parsed AssetsDetails object.
+    test('AssetsDetails_fromJson_ValidJson_ReturnsAssetsDetailsObject', () {
       final jsonMap = {
         "clientID": 1,
         "numProducts": 2,
@@ -52,10 +49,9 @@ void main() {
         "timestamp": "2025-03-27T12:00:00Z"
       };
 
-      // Parse the JSON map into an AssetsDetails object.
       final assetsDetails = AssetsDetails.fromJson(jsonMap);
 
-      // Verify that all top-level properties are parsed correctly.
+      // Verify top-level properties.
       expect(assetsDetails.clientID, 1);
       expect(assetsDetails.numProducts, 2);
       expect(assetsDetails.totalAmount, 1500.5);
@@ -77,10 +73,8 @@ void main() {
       expect(item.itemProfitLoss, 50.0);
     });
 
-    /// Tests the [AssetsSummary] model's fromJson method.
-    /// This test checks that the model correctly parses the JSON data for
-    /// a summary of assets, including the list of product details.
-    test('AssetsSummary.fromJson should parse correctly', () {
+    // Test AssetsSummary.fromJson: Given valid JSON, it should return a properly parsed AssetsSummary object.
+    test('AssetsSummary_fromJson_ValidJson_ReturnsAssetsSummaryObject', () {
       final jsonMap = {
         "clientID": 2,
         "numProducts": 3,
@@ -109,24 +103,21 @@ void main() {
       expect(assetsSummary.productDetails[1].prodTotal, 1000.0);
     });
 
-    /// Tests the [Bank] model's fromJson and toJson methods.
-    /// Verifies that JSON is parsed correctly and serialization returns the correct map.
-    test('Bank.fromJson and toJson should work correctly', () {
+    // Test Bank.fromJson and toJson: Validate that parsing and serialization work as expected.
+    test('Bank_fromJsonAndToJson_ValidJson_ReturnsCorrectBankObject', () {
       final jsonMap = {"bankName": "TD Bank", "logo": null, "bankID": 1};
 
       final bank = Bank.fromJson(jsonMap);
       expect(bank.name, "TD Bank");
       expect(bank.bankId, 1);
 
-      // Serialize the Bank object back to JSON.
       final toJson = bank.toJson();
       expect(toJson['name'], "TD Bank");
       expect(toJson['bankID'], 1);
     });
 
-    /// Tests the [Client] model's fromJson and toJson methods.
-    /// This test ensures that a client's details are correctly parsed and serialized.
-    test('Client.fromJson and toJson should work correctly', () {
+    // Test Client.fromJson and toJson: Ensure a client's data is parsed and serialized properly.
+    test('Client_fromJsonAndToJson_ValidJson_ReturnsCorrectClientObject', () {
       final jsonMap = {
         "clientID": 1,
         "clientName": "John Doe",
@@ -140,15 +131,13 @@ void main() {
       expect(client.clientEmail, "john@example.com");
       expect(client.clientAddress, "123 Main St");
 
-      // Verify serialization of the Client object.
       final toJson = client.toJson();
       expect(toJson["clientID"], 1);
       expect(toJson["clientName"], "John Doe");
     });
 
-    /// Tests the [Connection] model's fromJson method.
-    /// Checks that connection data, including nested connection elements, are parsed correctly.
-    test('Connection.fromJson should parse correctly', () {
+    // Test Connection.fromJson: Verify that connection data is parsed correctly.
+    test('Connection_fromJson_ValidJson_ReturnsCorrectConnectionObject', () {
       final jsonMap = {
         "clientID": 1,
         "numConnections": 2,
@@ -178,9 +167,9 @@ void main() {
       expect(element.connectionAmount, 3000.0);
     });
 
-    /// Tests the [ProfitReport] model's fromJson method.
-    /// Verifies that monthly profit data is correctly parsed.
-    test('ProfitReport.fromJson should parse correctly', () {
+    // Test ProfitReport.fromJson: Ensure monthly profit data is parsed as expected.
+    test('ProfitReport_fromJson_ValidJson_ReturnsCorrectProfitReportObject',
+        () {
       final jsonMap = {
         "clientID": 1,
         "profitReportByMonth": [
@@ -202,10 +191,10 @@ void main() {
       expect(profitReport.profitReportByMonth.first.totalProfitLoss, 200);
     });
 
-    /// Tests the [ClientStatement] model's fromJson method.
-    /// Ensures that a client's statement, including nested monthly statements
-    /// and transactions, is parsed correctly.
-    test('ClientStatement.fromJson should parse correctly', () {
+    // Test ClientStatement.fromJson: Verify that a client's statement (with monthly transactions) is parsed correctly.
+    test(
+        'ClientStatement_fromJson_ValidJson_ReturnsCorrectClientStatementObject',
+        () {
       final jsonMap = {
         "clientID": 1,
         "statement": [
@@ -235,10 +224,8 @@ void main() {
           statement.statement.first.transactions.first.transactionType, "Buy");
     });
 
-    /// Tests the [SummaryData] model's fromJson method.
-    /// Verifies that the overall summary, including product totals,
-    /// is correctly parsed from the JSON data.
-    test('SummaryData.fromJson should parse correctly', () {
+    // Test SummaryData.fromJson: Ensure that overall summary data is parsed correctly.
+    test('SummaryData_fromJson_ValidJson_ReturnsCorrectSummaryDataObject', () {
       final jsonMap = {
         "clientID": 1,
         "totalAmount": 3000.0,
